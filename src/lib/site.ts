@@ -11,10 +11,11 @@ export const site = {
   ],
   ventures: [
     {name:'Team Raygan', description:'Podcasts, stories and communities', href:process.env.NEXT_PUBLIC_TEAM_RAYGAN_URL || 'https://teamraygan.com/'},
-    {name:'Greyend Studio', description:'We Build Software That Drives Business Growth', href:process.env.NEXT_PUBLIC_GREYEND_URL},
-    {name:'Raygan Studio', description:'Video production and creative services', href:process.env.NEXT_PUBLIC_RAYGAN_STUDIO_URL},
+    {name:'Greyend Studio', description:'We Build Software That Drives Business Growth', href:process.env.NEXT_PUBLIC_GREYEND_URL || 'https://www.greyend.studio/'},
+    {name:'Raygan Studio', description:'Video production and creative services', href:process.env.NEXT_PUBLIC_RAYGAN_STUDIO_URL || 'https://www.rayganstudio.com/'},
   ],
   podcast: process.env.NEXT_PUBLIC_PODCAST_URL || 'https://www.unscriptedwithraygan.com/',
+  podcastYoutube: process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/@officialraygan',
   storyFilm: process.env.NEXT_PUBLIC_STORY_VIDEO_URL,
   reels: [process.env.NEXT_PUBLIC_REEL_1_URL, process.env.NEXT_PUBLIC_REEL_2_URL, process.env.NEXT_PUBLIC_REEL_3_URL],
 };

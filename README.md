@@ -44,11 +44,11 @@ The old `SUPABASE_SERVICE_ROLE_KEY` name remains supported for existing projects
 
 ## Content and remaining assets
 
-Your podcast website, YouTube, Instagram, TikTok, X and Team Raygan links are connected. Optional environment variables can override the supplied links. LinkedIn, Greyend Studio and Raygan Studio remain unavailable until their URLs are provided. Original About-page image placeholders remain as in Paper. The film and three reel players require direct HTTPS video files; a YouTube channel URL is not a playable video file. See `.env.example` for each field. No invented video or destination is used.
+Your podcast website, YouTube, Instagram, TikTok, X and Team Raygan links are connected. Optional environment variables can override the supplied links. Greyend Studio and Raygan Studio are connected. LinkedIn remains unavailable until its URL is provided. Original About-page image placeholders remain as in Paper. The film and three reel players require direct HTTPS video files; a YouTube channel URL is not a playable video file. See `.env.example` for each field. No invented video or destination is used.
 
 ## Booking and inquiry operations
 
-- Contact submissions are saved to Supabase. There is no automatic email notification or admin dashboard yet; review inquiries in Supabase's Table Editor.
+- Contact submissions are saved to Supabase. Speaking and hosting enquiries include company, phone, event date, format, location, role, audience, conditional budget and the full brief, stored together in the inquiry message without an additional migration. There is no automatic email notification or admin dashboard yet; review inquiries in Supabase's Table Editor.
 - Availability is three **requests**, not reserved calendar slots. After verified payment, review the booking and contact the customer on WhatsApp yourself to agree a time and send a calendar invitation. No WhatsApp or calendar messages are sent automatically.
 - Save & Exit keeps the draft for up to 24 hours in the same browser tab. It is not an emailed recovery link or cross-device account.
 - Reference material is an optional HTTPS link, not a file upload.
@@ -58,4 +58,4 @@ Your podcast website, YouTube, Instagram, TikTok, X and Team Raygan links are co
 
 ## Validation completed
 
-Production build and TypeScript checks; nine automated tests covering approved prices, booking validation, time zones, signature verification and payment mismatch rejection. Browser checks at 1440, 390 and 320 pixels covered all main pages without horizontal overflow, mobile navigation, session dialog and booking details through the GHS 1000 summary. Live Supabase writes, Paystack checkout/webhook delivery and Vercel hosting require your accounts and have not been verified.
+Production build and TypeScript checks; thirteen automated tests covering approved prices, booking validation, time zones, signature verification and payment mismatch rejection. Browser checks at 1440, 390 and 320 pixels covered all main pages without horizontal overflow, mobile navigation, session dialog and booking details through the GHS 1000 summary. Live Supabase writes, Paystack checkout/webhook delivery and Vercel hosting require your accounts and have not been verified.
