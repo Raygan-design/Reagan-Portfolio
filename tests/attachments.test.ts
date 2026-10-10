@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {attachmentError,validAttachmentContent,MAX_ATTACHMENT_BYTES} from '../src/lib/attachments';
+test('attachment selection limits count, total size, empty files and unsupported extensions',()=>{assert.equal(attachmentError([{name:'deck.pdf',size:100}]),'');for(const files of [[{name:'a.pdf',size:0}],[{name:'a.exe',size:100}],[{name:'a.pdf',size:MAX_ATTACHMENT_BYTES+1}],Array.from({length:4},()=>({name:'a.pdf',size:1}))])assert.ok(attachmentError(files))});
+test('server checks attachment contents instead of trusting the browser MIME type',async()=>{assert.equal(await validAttachmentContent(new File(['%PDF-1.7\nreference'], 'deck.pdf')),true);assert.equal(await validAttachmentContent(new File(['not a pdf'],'deck.pdf',{type:'application/pdf'})),false);assert.equal(await validAttachmentContent(new File(['A short script.'],'script.txt')),true);assert.equal(await validAttachmentContent(new File([new Uint8Array([0,255])],'script.txt')),false)});

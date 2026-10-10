@@ -1,3 +1,5 @@
+import { bookingBody } from '@/lib/server/booking-body';
+import { attachmentTypes } from '@/lib/attachments';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -5,9 +7,9 @@ import { bookingSchema, zonedTime } from '@/lib/validation';
 import { priceInPesewas, serviceById } from '@/lib/catalog';
 import { database } from '@/lib/server/db';
 import { paystack, paystackKey, hashToken } from '@/lib/server/paystack';
-import { checkOrigin, readJson, rateLimit, errorResponse, HttpError } from '@/lib/server/http';
+import { checkOrigin, rateLimit, errorResponse, HttpError } from '@/lib/server/http';
 export async function POST(request:Request){try{
-  checkOrigin(request);const parsed=bookingSchema.safeParse(await readJson(request));if(!parsed.success)throw new HttpError(400,parsed.error.issues[0].message);paystackKey();await rateLimit(request,'booking',10);
+  checkOrigin(request);const body=await bookingBody(request);const parsed=bookingSchema.safeParse(body.input);if(!parsed.success)throw new HttpError(400,parsed.error.issues[0].message);paystackKey();await rateLimit(request,'booking',10);
   const input=parsed.data,db=database(),jar=await cookies();
   const {data:existing,error:findError}=await db.from('bookings').select('*').eq('request_id',input.requestId).maybeSingle();if(findError)throw new HttpError(503,'Could not retrieve your booking.');
   let order=existing;
@@ -17,6 +19,18 @@ export async function POST(request:Request){try{
     const {data,error}=await db.from('bookings').insert({request_id:input.requestId,reference,access_hash:hashToken(token),service:input.service,duration:input.duration,amount:priceInPesewas(input.duration),currency:'GHS',name:input.name,email:input.email,phone:input.phone,time_zone:input.timeZone,work:input.work,goal:input.goal,material:input.material,availability:input.availability.map(a=>({...a,utc:zonedTime(a.date,a.time,input.timeZone)!.toISOString()})),status:'pending'}).select('*').single();
     if(error||!data)throw new HttpError(409,'Your booking could not be created. Please try again.');order=data;
     jar.set('raygan_booking',token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:60*60*24*7});
+  }
+  if(body.files.length&&!(order.attachments?.length)){
+    const uploaded:{name:string;path:string;size:number}[]=[];
+    try{
+      for(const [index,file] of body.files.entries()){
+        const extension=file.name.split('.').pop()!.toLowerCase(),path=`${order.reference}/${index}.${extension}`;
+        const {error}=await db.storage.from('booking-materials').upload(path,file,{contentType:attachmentTypes[extension],upsert:true});
+        if(error)throw new HttpError(503,'Your files could not be uploaded. Please try again.');uploaded.push({name:file.name.slice(0,200),path,size:file.size});
+      }
+      const {error}=await db.from('bookings').update({attachments:uploaded}).eq('reference',order.reference);
+      if(error)throw new HttpError(503,'Your attachments could not be saved. Please try again.');
+    }catch(error){if(uploaded.length)await db.storage.from('booking-materials').remove(uploaded.map(f=>f.path));throw error}
   }
   const base=process.env.NEXT_PUBLIC_SITE_URL||new URL(request.url).origin;
   const checkout=await paystack<{authorization_url:string}>('/transaction/initialize',{email:order.email,amount:order.amount,currency:'GHS',reference:order.reference,callback_url:`${base}/consulting/confirmation?reference=${order.reference}`,metadata:{service:serviceById(order.service)?.title,duration:order.duration}});
