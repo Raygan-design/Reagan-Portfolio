@@ -10,5 +10,5 @@ export const metadata: Metadata = {
   openGraph:{title:'Raygan — Created to Create.',description:'Products, media, stories and communities.',type:'website'},
 };
 export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en" data-scroll-behavior="smooth"><body><a className="skip-link" href="#main">Skip to content</a>{children}</body></html>;
+  return <html lang="en"><body><a className="skip-link" href="#main">Skip to content</a>{children}</body></html>;
 }
