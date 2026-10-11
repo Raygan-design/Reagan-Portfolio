@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import {isPossiblePhoneNumber} from 'libphonenumber-js/min';
 import { serviceIds } from './catalog';
 
 export const contactSchema=z.object({
@@ -35,7 +36,7 @@ export function zonedTime(date:string,time:string,zone:string):Date|null {
 const availabilitySchema=z.object({date:z.string().regex(/^\d{4}-\d{2}-\d{2}$/),time:z.string().regex(/^\d{2}:\d{2}$/)});
 export const bookingSchema=z.object({
   requestId:z.uuid(),service:z.enum(serviceIds),duration:z.union([z.literal(30),z.literal(60)]),
-  name:z.string().trim().min(2).max(120),email:z.email().max(254),phone:z.string().trim().regex(/^\+?[0-9\s()-]{7,25}$/,'Enter a valid WhatsApp number.'),
+  name:z.string().trim().min(2).max(120),email:z.email().max(254),phone:z.string().trim().regex(/^\+[0-9]{7,15}$/,'Enter a valid WhatsApp number with its country code.').refine(isPossiblePhoneNumber,'Check your WhatsApp number and country code.'),
   timeZone:z.string().refine(validTimezone,'Choose a valid time zone.'),work:z.string().trim().min(3).max(3000),goal:z.string().trim().min(10).max(5000),
   availability:z.array(availabilitySchema).length(3),material:z.union([z.literal(''),z.url().max(2000).refine(v=>v.startsWith('https://'),'Use a secure https link.')]).default(''),website:z.string().max(0).optional(),
 }).superRefine((data,ctx)=>{
