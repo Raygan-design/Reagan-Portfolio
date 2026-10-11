@@ -1,4 +1,5 @@
 'use client';
+import { Arrow } from '@/components/arrow';
 import Image from 'next/image';
 import { useRef, useState } from 'react';
 import { safeExternalUrl } from '@/lib/site';
@@ -16,6 +17,6 @@ export function Gallery({images,labels,compact=false}:{images:string[];labels?:s
   return <div className={compact?'gallery compact-gallery':'gallery'}>
     {!compact&&<div className="section-heading"><h2>From stages and conversations</h2><span className="gallery-instruction">Swipe through the gallery</span></div>}
     <div ref={track} className="gallery-track" onScroll={update} tabIndex={0} role="region" aria-label="Photo gallery" onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();move(e.key==='ArrowRight'?1:-1)}}}>{images.map((src,i)=><figure key={src} className="gallery-slide"><Image src={src} alt={labels?.[i]||`Reagan speaking at an event, photograph ${i+1}`} fill sizes={compact?'(max-width:700px) 80vw, 350px':'(max-width:700px) 80vw, 500px'}/>{labels&&<figcaption>{labels[i]}</figcaption>}</figure>)}</div>
-    <div className="gallery-controls"><span className="eyebrow" aria-live="polite" aria-atomic="true">{String(active+1).padStart(2,'0')} / {images.length}</span>{!compact&&<span className="gallery-hint">Drag or use arrows to explore all {images.length} photos</span>}<div className="arrow-buttons"><button className="icon-button" aria-label="Previous photo" disabled={active===0} onClick={()=>move(-1)}>←</button><button className="icon-button" aria-label="Next photo" disabled={active===images.length-1} onClick={()=>move(1)}>→</button></div></div>
+    <div className="gallery-controls"><span className="eyebrow" aria-live="polite" aria-atomic="true">{String(active+1).padStart(2,'0')} / {images.length}</span>{!compact&&<span className="gallery-hint">Drag or use arrows to explore all {images.length} photos</span>}<div className="arrow-buttons"><button className="icon-button" aria-label="Previous photo" disabled={active===0} onClick={()=>move(-1)}><Arrow direction="left"/></button><button className="icon-button" aria-label="Next photo" disabled={active===images.length-1} onClick={()=>move(1)}><Arrow direction="right"/></button></div></div>
   </div>;
 }
