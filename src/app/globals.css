@@ -37,3 +37,10 @@
 .brand-grid>div{padding:24px}.brand-grid .brand-logo{display:block;width:100%;max-width:220px;height:90px;object-fit:contain}.brand-grid .brand-logo-absa{max-width:90px}@media(max-width:760px){.brand-grid>div{height:120px;padding:18px}.brand-grid .brand-logo{height:70px}.brand-grid .brand-logo-absa{max-width:64px}}
 
 .podcast-carousel{height:auto;aspect-ratio:16/9}
+
+.hero-word{white-space:nowrap}
+.hero-letter-underlined{text-decoration-line:underline;text-decoration-color:#ad93ff;text-decoration-thickness:.06em;text-underline-offset:.09em;text-decoration-skip-ink:none}
+@media(prefers-reduced-motion:no-preference){
+  .hero-letter{animation:hero-type-letter 1ms step-end both}
+}
+@keyframes hero-type-letter{from{visibility:hidden}to{visibility:visible}}
