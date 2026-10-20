@@ -40,7 +40,4 @@
 
 .hero-word{white-space:nowrap}
 .hero-letter-underlined{text-decoration-line:underline;text-decoration-color:#ad93ff;text-decoration-thickness:.06em;text-underline-offset:.09em;text-decoration-skip-ink:none}
-@media(prefers-reduced-motion:no-preference){
-  .hero-letter{animation:hero-type-letter 1ms step-end both}
-}
-@keyframes hero-type-letter{from{visibility:hidden}to{visibility:visible}}
+
