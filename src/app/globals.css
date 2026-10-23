@@ -41,3 +41,17 @@
 .hero-word{white-space:nowrap}
 .hero-letter-underlined{text-decoration-line:underline;text-decoration-color:#ad93ff;text-decoration-thickness:.06em;text-underline-offset:.09em;text-decoration-skip-ink:none}
 
+
+/* The entire hero enters together while the headline begins typing. */
+@media(prefers-reduced-motion:no-preference){
+  .home-hero{animation:hero-entrance 1s cubic-bezier(.22,1,.36,1) both}
+}
+@keyframes hero-entrance{
+  from{opacity:0;filter:blur(8px);transform:translateY(18px)}
+  to{opacity:1;filter:blur(0);transform:translateY(0)}
+}
+
+@media(prefers-reduced-motion:no-preference){
+  .hero-headline:not(.hero-typing-ready){animation:hero-text-fallback .1s 3s both}
+}
+@keyframes hero-text-fallback{from{opacity:0}to{opacity:1}}

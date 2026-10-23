@@ -1,32 +1,37 @@
 'use client';
 
-import {useEffect, useRef} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 
 const headline = 'I’m Reagan Marfo, creative entrepreneur building products, media, stories and communities.';
 
 export function HeroHeadline() {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const heading = headingRef.current;
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!heading || preference.matches) return;
+    if (!heading) return;
+    if (preference.matches) {
+      heading.classList.add('hero-typing-ready');
+      return;
+    }
 
     const letters = Array.from(heading.querySelectorAll<HTMLElement>('.hero-letter'));
-    const started = performance.now();
+    const started = performance.now() + 180;
     let timer: ReturnType<typeof setInterval>;
     const finish = () => {
       clearInterval(timer);
       letters.forEach(letter => { letter.style.visibility = 'visible'; });
     };
     letters.forEach(letter => { letter.style.visibility = 'hidden'; });
+    heading.classList.add('hero-typing-ready');
     timer = setInterval(() => {
-      const count = Math.floor((performance.now() - started) / 28);
+      const count = Math.max(0, Math.floor((performance.now() - started) / 28));
       letters.slice(0, count).forEach(letter => { letter.style.visibility = 'visible'; });
       if (count >= letters.length) finish();
     }, 28);
     // Always reveal the complete heading, even after background-tab throttling.
-    const deadline = setTimeout(finish, 2800);
+    const deadline = setTimeout(finish, 3000);
     const onVisibility = () => { if (document.hidden) finish(); };
     preference.addEventListener('change', finish);
     document.addEventListener('visibilitychange', onVisibility);
