@@ -41,12 +41,12 @@
 .hero-underline{text-decoration-line:underline;text-decoration-color:#ad93ff;text-decoration-thickness:.06em;text-underline-offset:.09em;text-decoration-skip-ink:none}
 
 
-/* The entire hero blends in together on page load. */
+/* One shared entrance keeps the headline and film from revealing separately. */
 @media(prefers-reduced-motion:no-preference){
-  .home-hero{animation:hero-entrance 1s cubic-bezier(.22,1,.36,1) both}
+  .home-entrance{animation:hero-entrance 1.8s cubic-bezier(.25,.1,.25,1) both}
 }
 @keyframes hero-entrance{
-  from{opacity:0;filter:blur(8px);transform:translateY(18px)}
-  to{opacity:1;filter:blur(0);transform:translateY(0)}
+  from{opacity:0;filter:blur(6px);transform:translateY(20px)}
+  to{opacity:1;filter:none;transform:none}
 }
 
