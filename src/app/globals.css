@@ -50,3 +50,12 @@
   to{opacity:1;filter:none;transform:none}
 }
 
+
+/* Keep navigation steady while the new page content gently arrives. */
+@media(prefers-reduced-motion:no-preference){
+  .page-entrance{animation:page-entrance .85s cubic-bezier(.25,.1,.25,1) both}
+}
+@keyframes page-entrance{
+  from{opacity:0;filter:blur(3px);transform:translateY(10px)}
+  to{opacity:1;filter:none;transform:none}
+}

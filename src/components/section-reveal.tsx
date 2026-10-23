@@ -29,7 +29,7 @@ export function SectionReveal() {
     }, {threshold: 0, rootMargin: '0px 0px -24px 0px'});
 
     // Content remains visible by default; only sections below the fold animate.
-    document.querySelectorAll('#main > section, #main > .home-film').forEach(section => {
+    document.querySelectorAll('#main > section, #main > .page-entrance > section').forEach(section => {
       if (section.querySelector('form') || section.getBoundingClientRect().top < window.innerHeight) return;
       observer.observe(section);
     });
