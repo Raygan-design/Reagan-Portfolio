@@ -41,7 +41,7 @@ export function SupportAmount() {
       window.location.assign(result.url);
     } catch (error) { setError(error instanceof Error ? error.message : 'Could not open checkout. Please try again.'); setBusy(false); }
   }
-  const [choice, setChoice] = useState('50');
+  const [choice, setChoice] = useState('10');
   const [custom, setCustom] = useState('');
   const amount = choice === 'other' ? custom : choice;
   const valid = /^\d+(\.\d{1,2})?$/.test(amount) && Number(amount) >= 1 && Number(amount) <= 100000;
@@ -54,7 +54,7 @@ export function SupportAmount() {
     <fieldset className="support-amount-options" disabled={busy}>
       <legend className="eyebrow">One-time contribution · GHS</legend>
       <div className="support-amount-grid">
-        {['25', '50', '100', 'other'].map(value => <label key={value} className="support-amount-option">
+        {['10', '3', '5', '15', '100', 'other'].map(value => <label key={value} className="support-amount-option">
           <input type="radio" name="support-amount" value={value} checked={choice === value} onChange={() => setChoice(value)}/>
           <span>{value === 'other' ? 'Other' : `GHS ${value}`}</span>
         </label>)}

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const checkout = await paystack<{authorization_url: string}>('/transaction/initialize', {
       email, amount, currency: 'GHS', reference,
       callback_url: `${base}/support?reference=${reference}`,
-      metadata: {purpose: 'Keep the Moving Man going', cancel_action: `${base}/support?cancelled=1`},
+      metadata: {purpose: 'Keep the Moving Man going', support_amount: amount, support_email: email, cancel_action: `${base}/support?cancelled=1`},
     });
     const url = checkoutUrl(checkout.authorization_url);
     jar.set('raygan_support', sealSupport({reference, amount, email, url, expires: Date.now() + 86400000}, key), {
