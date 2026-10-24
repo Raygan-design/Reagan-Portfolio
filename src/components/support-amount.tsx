@@ -54,7 +54,7 @@ export function SupportAmount() {
     <fieldset className="support-amount-options" disabled={busy}>
       <legend className="eyebrow">One-time contribution · GHS</legend>
       <div className="support-amount-grid">
-        {['10', '3', '5', '15', '100', 'other'].map(value => <label key={value} className="support-amount-option">
+        {['10', '25', '50', '100', 'other'].map(value => <label key={value} className="support-amount-option">
           <input type="radio" name="support-amount" value={value} checked={choice === value} onChange={() => setChoice(value)}/>
           <span>{value === 'other' ? 'Other' : `GHS ${value}`}</span>
         </label>)}
