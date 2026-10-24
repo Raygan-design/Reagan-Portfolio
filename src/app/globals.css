@@ -71,3 +71,19 @@
 .support-amount{width:100%;font-family:inherit}.support-amount-options{border:0;padding:0;margin:0 0 20px;min-width:0}.support-amount-options legend{margin-bottom:14px}.support-amount-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.support-amount-option{position:relative;cursor:pointer;min-width:0}.support-amount-option input{position:absolute;opacity:0;width:1px;height:1px;margin:0}.support-amount-option span{display:flex;align-items:center;justify-content:center;min-height:48px;border:1px solid var(--line);padding:10px 6px;font-size:14px;line-height:20px;font-weight:500;white-space:nowrap}.support-amount-option input:checked+span{background:var(--mist);border-color:var(--night);color:var(--night)}.support-amount-option input:focus-visible+span{outline:3px solid var(--indigo);outline-offset:3px}.support-amount-option:hover span{border-color:var(--night)}.support-custom{margin-bottom:24px}.support-custom label{display:block;font-size:16px;margin-bottom:8px}.support-custom input{width:100%;min-width:0;min-height:48px;border:0;border-bottom:1px solid var(--ink);border-radius:0;background:transparent;padding:12px 0;font-family:inherit;font-size:16px;color:var(--ink)}.support-custom input:focus{outline:none;border-bottom-color:var(--night);box-shadow:inset 0 -1px 0 var(--night)}.support-custom p{font-size:13px;margin-top:8px;color:#962c37}.support-pay{width:100%;min-height:52px}.support-payment-status{font-size:13px;line-height:20px;color:#62616a;margin-top:12px}.support-contribution .handwritten{font-family:'Oooh Baby',cursive}.support-amount-options .eyebrow{font-family:inherit}
 @media(min-width:761px) and (max-width:1050px){.support-amount-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:360px){.support-amount-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* A gentle walk in place, with opposite arms and legs keeping a natural rhythm. */
+.moving-toggle{display:block;border:0;background:transparent;color:#62616a;font-size:12px;line-height:18px;min-height:44px;padding:8px 0;text-decoration:underline;text-underline-offset:4px}.moving-toggle+.support-scene-caption{margin-top:0}
+@media(prefers-reduced-motion:no-preference){
+ .moving-traveller{animation:moving-stride-bob 1s ease-in-out infinite}
+ .moving-leg{animation:moving-stride 2s ease-in-out infinite}
+ .moving-leg.back{animation-delay:-1s}
+ .moving-arm{animation:moving-arm-swing 2s ease-in-out infinite;animation-delay:-1s}
+ .moving-arm.back{animation-delay:0s}
+ .moving-scene[data-paused=true] .moving-traveller,.moving-scene[data-paused=true] .moving-leg,.moving-scene[data-paused=true] .moving-arm{animation-play-state:paused}
+}
+@keyframes moving-stride{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(20deg)}}
+@keyframes moving-arm-swing{0%,100%{transform:rotate(-25deg)}50%{transform:rotate(25deg)}}
+@keyframes moving-stride-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@media(prefers-reduced-motion:reduce){.moving-toggle{display:none}}
+@media print{.moving-toggle{display:none}.moving-traveller,.moving-leg,.moving-arm{animation:none!important}}

@@ -1,5 +1,25 @@
-export function MovingMan() {
-  return <div className="moving-scene" role="img" aria-label="An illustrated traveller in purple, ready for the next part of his journey">
+'use client';
+
+import {useEffect, useRef, useState} from 'react';
+
+// Pass a reference only after the server has verified a successful contribution.
+export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?: string}) {
+  const scene = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (!verifiedPaymentReference) return;
+    const animations = scene.current?.getAnimations({subtree: true}) ?? [];
+    animations.forEach(animation => animation.updatePlaybackRate(2.5));
+    const settle = window.setTimeout(() => {
+      animations.forEach(animation => animation.updatePlaybackRate(1));
+    }, 3600);
+    return () => {
+      window.clearTimeout(settle);
+      animations.forEach(animation => animation.updatePlaybackRate(1));
+    };
+  }, [verifiedPaymentReference]);
+  return <><div ref={scene} className="moving-scene" data-paused={paused} role="img" aria-label="An illustrated traveller in purple walking along his creative journey">
     <span className="moving-annotation handwritten">Still moving. Still creating.</span>
     <div className="moving-sun"/><div className="moving-hill"/><div className="moving-road"/>
     <div className="moving-traveller" aria-hidden="true">
@@ -8,5 +28,5 @@ export function MovingMan() {
       <div className="moving-leg back"><div className="moving-shoe"/></div><div className="moving-leg"><div className="moving-shoe"/></div><div className="moving-arm"/>
     </div>
     <span className="moving-destination">On to the next idea</span>
-  </div>;
+  </div><button type="button" className="moving-toggle" onClick={() => setPaused(value => !value)} aria-pressed={paused}>{paused ? 'Resume motion' : 'Pause motion'}</button></>;
 }
