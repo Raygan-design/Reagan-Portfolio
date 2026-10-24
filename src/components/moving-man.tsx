@@ -25,11 +25,7 @@ export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?
   return <><div ref={scene} className="moving-scene" data-paused={paused} role="img" aria-label="An illustrated traveller in purple walking along his creative journey">
     <span className="moving-annotation handwritten">Still moving. Still creating.</span>
     <div className="moving-sun"/><div className="moving-hill"/><div className="moving-road"/>
-    <div className="moving-traveller" aria-hidden="true">
-      <div className="moving-bag"/><div className="moving-arm back"/><div className="moving-neck"/>
-      <div className="moving-head"><div className="moving-hair"/></div><div className="moving-shirt"/>
-      <div className="moving-leg back"><div className="moving-shoe"/></div><div className="moving-leg"><div className="moving-shoe"/></div><div className="moving-arm"/>
-    </div>
+    <div className="moving-traveller" aria-hidden="true"/>
     <span className="moving-destination">On to the next idea</span>
   </div><button type="button" className="moving-toggle" onClick={() => setPaused(value => !value)} aria-pressed={paused}>{paused ? 'Resume motion' : 'Pause motion'}</button></>;
 }
