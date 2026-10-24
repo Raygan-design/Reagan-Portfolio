@@ -1,11 +1,12 @@
 import type {Metadata} from 'next';
 import {SupportAmount} from '@/components/support-amount';
+import {SupportPaymentProvider} from '@/components/support-payment-provider';
 import {MovingMan} from '@/components/moving-man';
 
 export const metadata: Metadata = {title: 'Keep the Moving Man going', description: 'Put a little fuel in Reagan’s creative journey.'};
 
 export default function Support() {
-  return <div className="page-entrance support-page">
+  return <SupportPaymentProvider><div className="page-entrance support-page">
     <section className="section support-intro">
       <p className="eyebrow">A little fuel for the journey</p>
       <h1>Keep the<br/><span className="hero-underline">Moving Man</span> going.</h1>
@@ -15,5 +16,5 @@ export default function Support() {
       </div>
       <div className="support-closing"><p>And yes, some of that fuel might be used for a nap.</p><span className="handwritten">Created to Create.</span></div>
     </section>
-  </div>;
+  </div></SupportPaymentProvider>;
 }
