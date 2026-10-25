@@ -13,7 +13,8 @@ const modalCopy = [paper['6JY-1'].text, paper['6KO-1'].text, paper['6M5-1'].text
 export const services = serviceIds.map((id, i) => ({id, number: String(i + 1).padStart(2, '0'), title: titles[i], description: descriptions[i], headline: modalCopy[i][1], audience: modalCopy[i][4], detail: modalCopy[i][5], questions: modalCopy[i].slice(7,11).map(q => q.replace(/^— /, '')), outcome: modalCopy[i][11]}));
 export const durations = [30, 60] as const;
 export type Duration = typeof durations[number];
-export const prices: Record<Duration, number> = {30: 500, 60: 1000};
+// Temporary live checkout test prices. Restore to {30: 500, 60: 1000} after testing.
+export const prices: Record<Duration, number> = {30: 1, 60: 1};
 export const sessionNames: Record<Duration, string> = {30: 'Clarity Conversation', 60: 'Strategy Conversation'};
 export function priceInPesewas(duration: Duration) { return prices[duration] * 100; }
 export function money(amount: number) { return `GHS ${amount}`; }

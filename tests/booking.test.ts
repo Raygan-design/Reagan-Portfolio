@@ -6,7 +6,7 @@ import { priceInPesewas, services } from '../src/lib/catalog';
 import { matchesTransaction, validSignature } from '../src/lib/payment-security';
 const future=(days:number)=>new Date(Date.now()+86400000*days).toISOString().slice(0,10);
 const booking={requestId:'ec9a402e-77f8-4d4c-b723-a55bcb2cc7d8',service:'product-design',duration:60,name:'Test Customer',email:'customer@example.com',phone:'+233240000000',timeZone:'Africa/Accra',work:'A new product',goal:'I need help with my product direction.',availability:[1,2,3].map(day=>({date:future(day),time:'12:00'})),material:''};
-test('server catalog charges the approved prices in pesewas',()=>{assert.equal(priceInPesewas(30),50000);assert.equal(priceInPesewas(60),100000)});
+test('server catalog charges the temporary GHS 1 consultation price for both lengths',()=>{assert.equal(priceInPesewas(30),100);assert.equal(priceInPesewas(60),100)});
 test('all four consulting offers retain four questions and their outcomes',()=>{for(const s of services){assert.equal(s.questions.length,4);assert.match(s.outcome,/^You leave with/);assert.ok(s.headline.length>10)}});
 test('valid bookings pass and client-supplied prices are discarded',()=>{const parsed=bookingSchema.parse({...booking,amount:1});assert.equal('amount' in parsed,false);assert.equal(parsed.duration,60)});
 test('rejects unknown services and durations',()=>{assert.equal(bookingSchema.safeParse({...booking,service:'free-session'}).success,false);assert.equal(bookingSchema.safeParse({...booking,duration:45}).success,false)});
