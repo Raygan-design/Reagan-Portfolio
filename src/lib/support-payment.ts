@@ -5,7 +5,7 @@ export const supportInput = z.object({
   amount: z.string().regex(/^\d+(\.\d{1,2})?$/).refine(value => Number(value) >= 1 && Number(value) <= 100000),
   email: z.email().max(254),
 });
-export type SupportSession = {reference: string; amount: number; email: string; expires: number; url?: string};
+export type SupportSession = {reference: string; amount: number; email: string; expires: number; origin?: string; url?: string};
 export function sealSupport(session: SupportSession, key: string) {
   const payload = Buffer.from(JSON.stringify(session)).toString('base64url');
   return `${payload}.${createHmac('sha256', key).update(`support:${payload}`).digest('hex')}`;

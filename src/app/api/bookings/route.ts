@@ -9,7 +9,7 @@ import { database } from '@/lib/server/db';
 import { paystack, paystackKey, hashToken } from '@/lib/server/paystack';
 import { checkOrigin, rateLimit, errorResponse, HttpError } from '@/lib/server/http';
 export async function POST(request:Request){try{
-  checkOrigin(request);const body=await bookingBody(request);const parsed=bookingSchema.safeParse(body.input);if(!parsed.success)throw new HttpError(400,parsed.error.issues[0].message);paystackKey();await rateLimit(request,'booking',10);
+  const base=checkOrigin(request);const body=await bookingBody(request);const parsed=bookingSchema.safeParse(body.input);if(!parsed.success)throw new HttpError(400,parsed.error.issues[0].message);paystackKey();await rateLimit(request,'booking',10);
   const input=parsed.data,db=database(),jar=await cookies();
   const {data:existing,error:findError}=await db.from('bookings').select('*').eq('request_id',input.requestId).maybeSingle();if(findError)throw new HttpError(503,'Could not retrieve your booking.');
   let order=existing;
@@ -32,7 +32,6 @@ export async function POST(request:Request){try{
       if(error)throw new HttpError(503,'Your attachments could not be saved. Please try again.');
     }catch(error){if(uploaded.length)await db.storage.from('booking-materials').remove(uploaded.map(f=>f.path));throw error}
   }
-  const base=process.env.NEXT_PUBLIC_SITE_URL||new URL(request.url).origin;
   const checkout=await paystack<{authorization_url:string}>('/transaction/initialize',{email:order.email,amount:order.amount,currency:'GHS',reference:order.reference,callback_url:`${base}/consulting/confirmation?reference=${order.reference}`,metadata:{service:serviceById(order.service)?.title,duration:order.duration}});
   const url=new URL(checkout.authorization_url);if(url.protocol!=='https:'||!(url.hostname==='checkout.paystack.com'||url.hostname.endsWith('.paystack.com')))throw new HttpError(502,'The payment provider returned an invalid checkout link.');
   const {error:saveError}=await db.from('bookings').update({checkout_url:url.href}).eq('reference',order.reference);if(saveError)throw new HttpError(503,'Checkout could not be saved. Please try again.');return NextResponse.json({url:url.href});

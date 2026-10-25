@@ -7,7 +7,7 @@ import {checkOrigin, readJson, HttpError, errorResponse} from '@/lib/server/http
 
 export async function POST(request: Request) {
   try {
-    checkOrigin(request);
+    const base = checkOrigin(request);
     const parsed = supportInput.safeParse(await readJson(request));
     if (!parsed.success) throw new HttpError(400, 'Enter a valid email and an amount between GHS 1 and GHS 100,000.');
     const key = process.env.PAYSTACK_SECRET_KEY;
@@ -17,18 +17,17 @@ export async function POST(request: Request) {
     const email = parsed.data.email.toLowerCase();
     const previous = openSupport(jar.get('raygan_support')?.value, key);
     // Reuse an unfinished checkout after a retry instead of creating another transaction.
-    if (previous?.url && previous.amount === amount && previous.email === email) {
+    if (previous?.url && previous.origin === base && previous.amount === amount && previous.email === email) {
       return NextResponse.json({url: checkoutUrl(previous.url)}, {headers: {'Cache-Control': 'no-store'}});
     }
     const reference = `support_${randomUUID().replaceAll('-', '')}`;
-    const base = new URL(process.env.NEXT_PUBLIC_SITE_URL || request.url).origin;
     const checkout = await paystack<{authorization_url: string}>('/transaction/initialize', {
       email, amount, currency: 'GHS', reference,
       callback_url: `${base}/support?reference=${reference}`,
       metadata: {purpose: 'Keep the Moving Man going', support_amount: amount, support_email: email, cancel_action: `${base}/support?cancelled=1`},
     });
     const url = checkoutUrl(checkout.authorization_url);
-    jar.set('raygan_support', sealSupport({reference, amount, email, url, expires: Date.now() + 86400000}, key), {
+    jar.set('raygan_support', sealSupport({reference, amount, email, url, origin: base, expires: Date.now() + 86400000}, key), {
       httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/api/support', maxAge: 86400,
     });
     return NextResponse.json({url}, {headers: {'Cache-Control': 'no-store'}});
