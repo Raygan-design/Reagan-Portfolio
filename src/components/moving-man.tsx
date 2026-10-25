@@ -36,8 +36,29 @@ export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?
     </svg>
     <div className="moving-road" aria-hidden="true"><span className="moving-road-edge"/><span className="moving-road-marks"/></div>
     <div className="moving-traffic" aria-hidden="true">
-      <span className="moving-car"><i/><b/><em/></span>
-      <span className="moving-bicycle"><i/><b/><em/><strong/></span>
+      <svg className="moving-car" viewBox="0 0 220 92">
+        <g className="vehicle-shadow"><ellipse cx="111" cy="78" rx="93" ry="7"/></g>
+        <g className="vehicle-body">
+          <path d="M20 63l8-24c2-7 8-12 16-13l33-5 25-14h48c13 0 23 5 32 15l13 18 13 5c6 2 9 7 9 13v12H16v-3c0-2 2-4 4-4Z"/>
+          <path className="vehicle-glass" d="M82 22l24-12h38c10 0 18 4 25 12l8 12H74l8-12Z"/>
+          <path className="vehicle-divider" d="M116 10v24m-43 0h108M31 43h18m132 0h16M20 60h20m139 0h37"/>
+          <path className="vehicle-detail" d="M67 42h22m54 0h18M105 43h27M94 51h12M37 54h16m134 0h18"/>
+          <path className="vehicle-bumper" d="M16 68h26m137 0h39"/>
+          <path className="vehicle-light" d="M28 43h12v9H25m169-7h13l5 8h-18Z"/>
+        </g>
+        <g className="vehicle-wheel vehicle-wheel-one"><circle cx="64" cy="69" r="20"/><circle cx="64" cy="69" r="11"/><circle cx="64" cy="69" r="3"/><path d="M64 58v22M53 69h22m-19-8 16 16m0-16-16 16"/></g>
+        <g className="vehicle-wheel vehicle-wheel-two"><circle cx="168" cy="69" r="20"/><circle cx="168" cy="69" r="11"/><circle cx="168" cy="69" r="3"/><path d="M168 58v22m-11-11h22m-19-8 16 16m0-16-16 16"/></g>
+      </svg>
+      <svg className="moving-bicycle" viewBox="0 0 190 112">
+        <g className="bicycle-shadow"><ellipse cx="96" cy="102" rx="83" ry="5"/></g>
+        <g className="bicycle-wheel bicycle-wheel-one"><circle cx="42" cy="76" r="34"/><circle cx="42" cy="76" r="3"/><path d="M42 42v68M8 76h68M18 52l48 48m0-48-48 48M30 44l24 64m-44-20 64-24"/></g>
+        <g className="bicycle-wheel bicycle-wheel-two"><circle cx="148" cy="76" r="34"/><circle cx="148" cy="76" r="3"/><path d="M148 42v68m-34-34h68m-58-24 48 48m0-48-48 48m12-56 24 64m-44-20 64-24"/></g>
+        <g className="bicycle-frame">
+          <path d="M42 76 74 42l29 34H42Zm32-34 45 4 29 30h-45L74 42Z"/>
+          <path d="m103 76 17-51h22m-68 17-7-15m-15-3h26m62 2 13-9m-3-6 8 14M99 76h17m-9 0a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/>
+          <path className="bicycle-chain" d="M99 76h-41"/>
+        </g>
+      </svg>
     </div>
     <div className="moving-sidewalk" aria-hidden="true"><span/></div>
     <div className="moving-traveller" aria-hidden="true"/>
