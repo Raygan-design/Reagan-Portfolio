@@ -1,5 +1,6 @@
 'use client';
 
+import {MovingNeighborhood} from './moving-neighborhood';
 import {useSupportPayment} from './support-payment-provider';
 import {useEffect, useId, useRef, useState} from 'react';
 
@@ -22,58 +23,11 @@ export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?
       animations.forEach(animation => animation.updatePlaybackRate(1));
     };
   }, [confirmedReference]);
-  return <><div ref={scene} className="moving-scene" data-paused={paused} role="img" aria-label="An illustrated traveller in purple walking along a neighborhood street with passing cars, a cyclist, a jogger and detailed buildings behind him">
+  return <><div ref={scene} className="moving-scene" data-paused={paused} role="img" aria-label="An illustrated traveller in purple walking along a neighborhood street with passing cars, a cyclist, detailed houses and leafy trees behind him">
     <span className="moving-annotation handwritten">Still moving. Still creating.</span>
     <div className="moving-sky" aria-hidden="true"><span className="moving-cloud moving-cloud-one"/><span className="moving-cloud moving-cloud-two"/><span className="moving-sun"/></div>
-    <svg className="moving-neighborhood" viewBox="0 0 1000 210" preserveAspectRatio="none" aria-hidden="true">
-      <g className="moving-buildings">
-        <path d="M0 196H1000M18 196V121h120v75M8 121l70-54 72 54M39 144h27v31H39zm56 0h25v31H95M177 196v-58h145v58m-159-58 86-66 90 66m-136 20h27v27h-27zm66 0h27v27h-27M371 196v-82h132v82m-12-82-54-43-78 43m36 22h25v29h-25zm61 0h24v29h-24M552 196v-61h146v61m-160-61 87-60 88 60m-135 21h27v28h-27zm66 0h27v28h-27M749 196v-72h147v72m-160-72 86-62 91 62m-136 20h27v31h-27zm65 0h27v31h-27M928 196v-50h72"/>
-        <g className="moving-building-details">
-          <path d="M71 196v-38h18v38m-44-52v31m8-31v31m-14-17h27m29 0h25m-13-14v31M26 125h105M47 102h62M62 90h30M112 92V73h12v29M215 139h95M240 196v-39h18v39m-55-26h27m-13-13v27m52-14h27m-13-13v27M216 115h65m-52-12h37M425 196v-45h22v45m-52-45h25m-12-15v29m48-14h24m-12-15v29M380 118h114m-79-27h45M597 196v-40h28v40m-47-26h27m-14-14v28m53-14h27m-13-14v28M565 139h123M603 99h46M803 196v-39h27v39m-53-14h27m-13-38v31m52-14h27m-13-17v31M758 128h129m-88-41h52M936 152h64m-52 11h18v20h-18m30-20h18v20h-18"/>
-          <path d="M68 184h24m-27 6h30m143-4h23m-26 5h29m156-4h32m-34 5h36m143-6h33m-36 6h39m172-6h33m-36 6h39M19 185h36m61 0h21M180 188h39m82 0h20M373 183h30m75 0h24M555 185h25m91 0h24M751 185h25m94 0h24"/>
-          <path d="M41 179h24v6H41zm54 0h25v6H95zm483 9h27v6h-27zm66 0h27v6h-27z"/>
-        </g>
-        <g className="moving-street-details">
-          <path d="M334 196v-99q0-12 12-12h18m-6 0v6h12v-6Zm389 111V87q0-12 12-12h18m-6 0v6h12v-6ZM103 196v-12m-6 0h12m-8-4h4M474 196v-12m-6 0h12m-8-4h4M873 196v-12m-6 0h12m-8-4h4"/>
-          <path d="M285 193h32m-30-7h28v7m-24 0v4m20-4v4M674 193h31m-29-7h27v7m-23 0v4m19-4v4"/>
-        </g>
-      </g>
-      <g className="moving-trees">
-        <path d="M158 198v-72m0 0c-23 1-33-18-21-31-8-18 8-34 25-27 16-12 37 4 28 22 14 15 0 37-20 32-3 7-7 9-12 4zm189 72v-67m0 0c-22 1-31-17-19-29-8-17 7-33 24-26 15-11 35 4 27 21 13 15 0 35-19 30-3 6-7 8-13 4zm182 67v-73m0 0c-23 1-33-18-20-31-8-18 8-34 25-27 16-12 37 4 28 22 14 16 0 37-20 32-3 7-7 9-13 4zm190 73v-65m0 0c-21 1-31-17-19-29-7-16 8-31 24-25 15-11 34 4 26 21 13 14 0 34-18 29-3 7-7 9-13 4zm201 65v-73m0 0c-23 1-33-18-20-31-8-18 8-34 25-27 16-12 37 4 28 22 14 16 0 37-20 32-3 7-7 9-13 4z"/>
-      </g>
-      <path className="moving-shrubs" d="M0 197c32-22 60-14 88 0m95 0c31-24 62-15 90 0m115 0c34-23 66-14 96 0m104 0c32-24 65-15 92 0m105 0c31-22 61-14 87 0m71 0c27-18 52-11 77 0"/>
-    </svg>
+    <MovingNeighborhood/>
     <div className="moving-road" aria-hidden="true"><span className="moving-road-edge"/><span className="moving-road-marks"/></div>
-    <div className="moving-jogger-track" aria-hidden="true">
-      <svg className="moving-jogger" viewBox="0 0 60 110">
-        <ellipse cx="27" cy="106" rx="16" ry="1.7" fill="#e5e1e9"/>
-        <g className="jogger-body" strokeLinecap="round" strokeLinejoin="round">
-          <g className="jogger-far-leg">
-            <path d="M24 53Q21 65 12 75L25 85" fill="none" stroke="#aaa3ae" strokeWidth="7"/>
-            <path d="m24 81 4 4 3 1q3 2 0 4l-5 1-8-7Z" fill="#f1eee7" stroke="#a39ba9" strokeWidth=".8"/>
-          </g>
-          <path d="M24 31 14 45 6 40" fill="none" stroke="#bca28e" strokeWidth="5"/>
-          <g className="jogger-near-leg">
-            <path d="M25 55Q32 63 40 74L28 99" fill="none" stroke="#8c8494" strokeWidth="7"/>
-            <path d="m25 96 6 2 1 3 8 3q2 3-1 4H24q-2-2 1-12Z" fill="#f3f0e8" stroke="#9b92a2" strokeWidth=".8"/>
-            <path d="M25 105h14" fill="none" stroke="#b8b1bf" strokeWidth="1"/>
-          </g>
-          <path d="M21 47q6 1 11 5l-3 10-11-2-3-7Z" fill="#8e8798"/>
-          <path d="m28 19-2 9 8 2 2-11Z" fill="#bca18d"/>
-          <path d="M25 26q5-3 11 1l-1 13-9 14q-6 1-12-3l7-18Z" fill="#bec5be" stroke="#a1aaa1" strokeWidth=".8"/>
-          <path d="m24 32 7 4 3-7q-5-6-10 3Z" fill="#b1bbb1"/>
-          <path d="M30 9q0-7 7-7 8 0 8 9l2 4-4 1-1 7q-5 3-10-3Z" fill="#bca18d" stroke="#a28b7c" strokeWidth=".7"/>
-          <path d="M30 15q-5-6-1-12 3-5 11-3 7 1 7 8l-13-2-1 8Z" fill="#817b85"/>
-          <path d="M33 13q-3-2-3 1t3 3" fill="none" stroke="#a28b7c" strokeWidth=".8"/>
-          <circle cx="42" cy="11" r=".65" fill="#77707b"/>
-          <path d="m39 19 3 .2" stroke="#a28b7c" strokeWidth=".7"/>
-          <g className="jogger-near-arm">
-            <path d="m29 33 11 13 11-11" fill="none" stroke="#bca18d" strokeWidth="5.5"/>
-            <path d="m49 36 2-4q2-2 4 0l-1 5-3 2" fill="#bca18d"/>
-          </g>
-        </g>
-      </svg>
-    </div>
     <div className="moving-traffic" aria-hidden="true">
       <StreetCar className="moving-car"/>
       <StreetCar className="moving-car moving-car-sage"/>
