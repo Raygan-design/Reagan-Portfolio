@@ -8,21 +8,41 @@ export function JourneyMusic() {
   const trigger = useRef<HTMLButtonElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pinned = useRef(false);
+  const userControlledPlayback = useRef(false);
   const panelId = useId();
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [volume, setVolume] = useState(6);
+  const [volume, setVolume] = useState(3);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const player = audio.current;
     if (!player) return;
-    player.volume = .06;
+    // Set the quiet level before requesting playback, including on browsers
+    // that already allow audible autoplay for this site.
+    player.volume = .03;
+    const stopWaitingForGesture = () => {
+      document.removeEventListener('click', startOnInteraction);
+      document.removeEventListener('keydown', startOnInteraction);
+    };
+    function startOnInteraction(event: Event) {
+      if (userControlledPlayback.current || document.hidden || container.current?.contains(event.target as Node)) return;
+      if (event instanceof KeyboardEvent && (event.repeat || !['Enter', ' '].includes(event.key))) return;
+      void player!.play().catch(() => { /* The play button remains available. */ });
+    }
+    document.addEventListener('click', startOnInteraction);
+    document.addEventListener('keydown', startOnInteraction);
+    // Successful playback removes the fallback, so a later deliberate pause
+    // is never undone by another click elsewhere on the page.
+    player.addEventListener('playing', stopWaitingForGesture);
+    if (!document.hidden) void player.play().catch(() => { /* Wait for a browser-approved interaction. */ });
     const pauseWhenHidden = () => { if (document.hidden) player.pause(); };
     document.addEventListener('visibilitychange', pauseWhenHidden);
     return () => {
       document.removeEventListener('visibilitychange', pauseWhenHidden);
+      stopWaitingForGesture();
+      player.removeEventListener('playing', stopWaitingForGesture);
       if (closeTimer.current) clearTimeout(closeTimer.current);
       player.pause();
     };
@@ -57,6 +77,7 @@ export function JourneyMusic() {
   async function toggle() {
     const player = audio.current;
     if (!player || loading) return;
+    userControlledPlayback.current = true;
     if (!player.paused) { player.pause(); return; }
     setError('');
     setLoading(true);
