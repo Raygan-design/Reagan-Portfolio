@@ -40,7 +40,6 @@
 
 .hero-underline{text-decoration-line:underline;text-decoration-color:#ad93ff;text-decoration-thickness:.06em;text-underline-offset:.09em;text-decoration-skip-ink:none}
 
-
 /* One shared entrance keeps the headline and film from revealing separately. */
 @media(prefers-reduced-motion:no-preference){
   .home-entrance{animation:hero-entrance 1.2s cubic-bezier(.25,.1,.25,1) both}
@@ -49,7 +48,6 @@
   from{filter:blur(6px);transform:translateY(20px)}
   to{filter:none;transform:none}
 }
-
 
 /* Keep navigation steady while the new page content gently arrives. */
 @media(prefers-reduced-motion:no-preference){
@@ -107,8 +105,6 @@
  .moving-buildings{animation:moving-background-drift 32s linear infinite alternate}
  .moving-road-marks{animation:moving-road-flow 5.5s linear infinite}
  .moving-sidewalk>span{animation:moving-sidewalk-flow 9s linear infinite}
- .moving-car{animation:moving-car-pass 15s linear infinite 1.5s}
- .moving-bicycle{animation:moving-bicycle-pass 19s linear infinite 8s}
  .moving-car .vehicle-wheel,.moving-bicycle .bicycle-wheel{transform-box:fill-box;transform-origin:center;animation:moving-wheel-spin 1.1s linear infinite}
  .moving-scene[data-paused=true] *{animation-play-state:paused!important}
 }
@@ -116,8 +112,6 @@
 @keyframes moving-background-drift{from{transform:translateX(0)}to{transform:translateX(-32px)}}
 @keyframes moving-road-flow{to{transform:translateX(-112px)}}
 @keyframes moving-sidewalk-flow{to{transform:translateX(-255px)}}
-@keyframes moving-car-pass{0%{transform:translateX(0)}100%{transform:translateX(980px)}}
-@keyframes moving-bicycle-pass{0%{transform:translateX(0)}100%{transform:translateX(940px)}}
 @keyframes moving-wheel-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.moving-toggle{display:none}}
 @media print{.moving-toggle{display:none}.moving-traveller{animation:none!important}}
@@ -126,19 +120,6 @@
 .moving-car-sage .vehicle-body{fill:#bbc8c2}.moving-car-sage .vehicle-glass{fill:#eef2ef}
 .moving-car-far{bottom:94px;width:112px;left:auto;right:-150px;transform:scaleX(-1)}
 .moving-car-far .vehicle-body{fill:#d3c5b6}.moving-car-far .vehicle-glass{fill:#f4efe9}
-
-
-
-@media(prefers-reduced-motion:no-preference){
- .moving-car-sage{animation:moving-car-pass 18s linear infinite -9s}
- .moving-car-far{animation:moving-car-return 21s linear infinite -4s}
- 
-}
-@keyframes moving-car-return{from{transform:translateX(0) scaleX(-1)}to{transform:translateX(-980px) scaleX(-1)}}
-
-
-
-@media(max-width:760px){.moving-car-sage{animation-delay:-13s}}
 
 @media(prefers-reduced-motion:reduce){.moving-car-far{right:15%}}
 
@@ -152,3 +133,19 @@
 .support-thanks{display:flex;align-items:flex-start;gap:12px;padding:16px;margin-bottom:24px;border:1px solid #ded2fa;background:#f6f2ff;color:var(--night)}
 .support-thanks strong{font-size:17px;line-height:24px;font-weight:600}.support-thanks p{font-size:13px;line-height:20px;margin-top:4px;color:#6d627e}.support-thanks button{flex-shrink:0;margin:-10px -10px -10px auto;width:44px;height:44px;border:0;font-size:24px;line-height:1}
 @media(prefers-reduced-motion:reduce){.support-confetti{display:none}}
+
+/* One 40-second schedule: every vehicle exits completely before the next
+   enters. Percent-based exits adapt to the actual scene width, and shared
+   timing stays aligned when motion pauses or speeds up after a contribution. */
+.moving-car-far{z-index:0;transform-origin:center;transform-box:border-box}.moving-car-primary,.moving-car-sage,.moving-bicycle{z-index:1}
+@media(prefers-reduced-motion:no-preference){
+ .moving-traffic>svg{animation-duration:40s;animation-timing-function:linear;animation-iteration-count:infinite;animation-delay:0s;animation-fill-mode:both}
+ .moving-car-primary{animation-name:traffic-primary}
+ .moving-car-sage{animation-name:traffic-sage}
+ .moving-car-far{animation-name:traffic-return}
+ .moving-bicycle{animation-name:traffic-cycle}
+}
+@keyframes traffic-primary{0%{left:-190px}20%,100%{left:100%}}
+@keyframes traffic-sage{0%,25%{left:-190px}45%,100%{left:100%}}
+@keyframes traffic-return{0%,50%{right:-150px}70%,100%{right:100%}}
+@keyframes traffic-cycle{0%,75%{left:-130px}97%,100%{left:100%}}

@@ -29,9 +29,9 @@ export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?
     <MovingNeighborhood/>
     <div className="moving-road" aria-hidden="true"><span className="moving-road-edge"/><span className="moving-road-marks"/></div>
     <div className="moving-traffic" aria-hidden="true">
-      <StreetCar className="moving-car"/>
-      <StreetCar className="moving-car moving-car-sage"/>
       <StreetCar className="moving-car moving-car-far"/>
+      <StreetCar className="moving-car moving-car-primary"/>
+      <StreetCar className="moving-car moving-car-sage"/>
       <svg className="moving-bicycle" viewBox="0 -85 190 197">
         <g className="bicycle-shadow"><ellipse cx="96" cy="102" rx="83" ry="5"/></g>
         <g className="bicycle-wheel bicycle-wheel-one"><circle cx="42" cy="76" r="34"/><circle cx="42" cy="76" r="3"/><path d="M42 42v68M8 76h68M18 52l48 48m0-48-48 48M30 44l24 64m-44-20 64-24"/></g>
