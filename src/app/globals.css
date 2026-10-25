@@ -122,3 +122,28 @@
 @keyframes moving-wheel-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.moving-toggle{display:none}}
 @media print{.moving-toggle{display:none}.moving-traveller{animation:none!important}}
+
+/* Staggered traffic stays behind the traveller, with smaller vehicles in the far lane. */
+.moving-car-sage .vehicle-body{fill:#bbc8c2}.moving-car-sage .vehicle-glass{fill:#eef2ef}
+.moving-car-far{bottom:94px;width:112px;opacity:.75;left:auto;right:-150px;transform:scaleX(-1)}
+.moving-car-far .vehicle-body{fill:#d3c5b6}.moving-car-far .vehicle-glass{fill:#f4efe9}
+.moving-building-details{stroke-width:1;opacity:.8}.moving-street-details{stroke-width:1.4;opacity:.85}
+.moving-jogger-track{position:absolute;bottom:124px;left:-60px;width:36px;height:70px;z-index:2;opacity:.7;pointer-events:none}
+.moving-jogger{width:100%;height:100%;overflow:visible}.jogger-top{fill:#b9b6c6;stroke:#756c7e;stroke-width:1.4}
+.jogger-skin{fill:#b18b73;stroke:#756c7e;stroke-width:1}.jogger-far-limb{fill:none;stroke:#a39aa9;stroke-width:5;stroke-linecap:round}
+.jogger-near-arm{fill:none;stroke:#b18b73;stroke-width:5;stroke-linecap:round}.jogger-near-leg{fill:none;stroke:#756c7e;stroke-width:6;stroke-linecap:round}
+@media(prefers-reduced-motion:no-preference){
+ .moving-car-sage{animation:moving-car-pass 18s linear infinite -9s}
+ .moving-car-far{animation:moving-car-return 21s linear infinite -4s}
+ .moving-jogger-track{animation:moving-jogger-pass 29s linear infinite -13s}
+ .jogger-body{animation:moving-jogger-bounce .48s ease-in-out infinite alternate;transform-origin:center}
+ .jogger-near-leg{animation:moving-jogger-stride .48s ease-in-out infinite alternate;transform-origin:23px 48px}
+ .jogger-far-limb{animation:moving-jogger-stride .48s ease-in-out infinite alternate-reverse;transform-origin:21px 45px}
+}
+@keyframes moving-car-return{from{transform:translateX(0) scaleX(-1)}to{transform:translateX(-980px) scaleX(-1)}}
+@keyframes moving-jogger-pass{from{transform:translateX(0)}to{transform:translateX(940px)}}
+@keyframes moving-jogger-bounce{to{transform:translateY(-2px)}}
+@keyframes moving-jogger-stride{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@media(max-width:760px){.moving-car-sage{animation-delay:-13s}.moving-jogger-track{bottom:124px;width:30px;height:59px}}
+
+@media(prefers-reduced-motion:reduce){.moving-car-far{right:15%}.moving-jogger-track{left:62%}}
