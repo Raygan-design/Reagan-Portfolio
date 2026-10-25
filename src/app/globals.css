@@ -145,3 +145,10 @@
 /* Architecture remains proportionate and opaque on every screen. */
 .moving-neighborhood{top:auto;bottom:124px;height:178px;opacity:1}
 @media(max-width:760px){.moving-neighborhood{top:auto;bottom:124px;height:151px}}
+
+.support-confetti{position:fixed;inset:0;z-index:80;overflow:hidden;pointer-events:none}
+.support-confetti i{position:absolute;display:block;top:-24px;animation:support-confetti-fall 3.8s linear both}
+@keyframes support-confetti-fall{0%{transform:translate3d(0,-20px,0) rotate(0);opacity:1}85%{opacity:1}100%{transform:translate3d(var(--confetti-drift),110vh,0) rotate(var(--confetti-turn));opacity:0}}
+.support-thanks{display:flex;align-items:flex-start;gap:12px;padding:16px;margin-bottom:24px;border:1px solid #ded2fa;background:#f6f2ff;color:var(--night)}
+.support-thanks strong{font-size:17px;line-height:24px;font-weight:600}.support-thanks p{font-size:13px;line-height:20px;margin-top:4px;color:#6d627e}.support-thanks button{flex-shrink:0;margin:-10px -10px -10px auto;width:44px;height:44px;border:0;font-size:24px;line-height:1}
+@media(prefers-reduced-motion:reduce){.support-confetti{display:none}}

@@ -3,6 +3,7 @@
 import {useEffect, useState, type FormEvent} from 'react';
 import {useSupportPayment} from './support-payment-provider';
 import {Arrow} from '@/components/arrow';
+import {SupportCelebration} from './support-celebration';
 
 export function SupportAmount() {
   const {confirm} = useSupportPayment();
@@ -17,7 +18,11 @@ export function SupportAmount() {
       const response = await fetch('/api/support/verify', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({reference: ref})});
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Could not check your payment. Please try again.');
-      setPaid(true); confirm(result.reference);
+      setPaid(true); setReference(''); confirm(result.reference);
+      if (typeof result.email === 'string') setEmail(result.email);
+      const confirmedAmount = String(result.amount / 100);
+      if (['10', '25', '50', '100'].includes(confirmedAmount)) setChoice(confirmedAmount);
+      else { setChoice('other'); setCustom(confirmedAmount); }
       window.history.replaceState(null, '', '/support');
     } catch (error) { setError(error instanceof Error ? error.message : 'Could not check your payment. Please try again.'); }
     finally { setBusy(false); }
@@ -33,7 +38,7 @@ export function SupportAmount() {
   async function checkout(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!valid || busy) return;
-    setBusy(true); setError('');
+    setBusy(true); setError(''); setPaid(false);
     try {
       const response = await fetch('/api/support', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({amount, email})});
       const result = await response.json();
@@ -48,9 +53,21 @@ export function SupportAmount() {
   const formatted = valid ? new Intl.NumberFormat('en-GH', {maximumFractionDigits: 2}).format(Number(amount)) : '';
   const invalidCustom = choice === 'other' && custom !== '' && !valid;
 
-  if (paid) return <div className="support-amount" role="status"><h3>A little further, thanks to you.</h3><p className="support-payment-status">Thank you for putting a little fuel in the journey. Your contribution is confirmed.</p></div>;
-  if (reference) return <div className="support-amount" aria-live="polite">{busy ? <p>Confirming your contribution…</p> : <><p role="alert">{error}</p><button className="button outline" onClick={() => void verify(reference)}>Check payment again</button><button className="text-button" onClick={() => {setReference(''); setError(''); window.history.replaceState(null, '', '/support');}}>Return to contribution</button></>}</div>;
   return <form className="support-amount" onSubmit={checkout} aria-busy={busy}>
+    {paid && <>
+      <SupportCelebration/>
+      <div className="support-thanks" role="status">
+        <div><strong>A little further, thanks to you.</strong><p>Your contribution is confirmed. Thank you for the support.</p></div>
+        <button type="button" aria-label="Dismiss thank-you message" onClick={() => setPaid(false)}>×</button>
+      </div>
+    </>}
+    {reference && <div className="support-payment-status" aria-live="polite">
+      {busy ? <p>Confirming your contribution…</p> : <>
+        <p role="alert">{error}</p>
+        <button type="button" className="text-button" onClick={() => void verify(reference)}>Check payment again</button>
+        <button type="button" className="text-button" onClick={() => {setReference(''); setError(''); window.history.replaceState(null, '', '/support');}}>Return to contribution</button>
+      </>}
+    </div>}
     <fieldset className="support-amount-options" disabled={busy}>
       <legend className="eyebrow">One-time contribution · GHS</legend>
       <div className="support-amount-grid">
@@ -69,7 +86,7 @@ export function SupportAmount() {
       <label htmlFor="support-email">Email address</label>
       <input id="support-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} disabled={busy}/>
     </div>
-    <button className="button primary support-pay" disabled={!valid || busy}>{busy ? 'Opening Paystack…' : <>Add a little fuel{formatted && ` · GHS ${formatted}`} <Arrow/></>}</button>
-    {error && <p className="support-payment-status" role="alert">{error}</p>}
+    <button className="button primary support-pay" disabled={!valid || busy || Boolean(reference)}>{busy ? (reference ? 'Confirming payment…' : 'Opening Paystack…') : <>Add a little fuel{formatted && ` · GHS ${formatted}`} <Arrow/></>}</button>
+    {error && !reference && <p className="support-payment-status" role="alert">{error}</p>}
   </form>;
 }
