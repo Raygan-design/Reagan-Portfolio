@@ -45,16 +45,32 @@ export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?
     </svg>
     <div className="moving-road" aria-hidden="true"><span className="moving-road-edge"/><span className="moving-road-marks"/></div>
     <div className="moving-jogger-track" aria-hidden="true">
-      <svg className="moving-jogger" viewBox="0 0 46 92">
-        <ellipse cx="23" cy="88" rx="16" ry="2" fill="#7b748516"/>
-        <g className="jogger-body">
-          <path className="jogger-far-limb" d="m21 45-12 18 13 17m1-48-12 12-7-8"/>
-          <path className="jogger-top" d="m20 24 10 2 1 17-10 9-9-6 5-17Z"/>
-          <path className="jogger-skin" d="m23 25 2-8 7 1-2 9M24 18q-7-3-4-10 2-6 9-5 6 1 6 7l3 3-4 1-1 6Z"/>
-          <path d="M19 11q-4-10 6-11 10 0 11 8l-11-2-2 6Z" fill="#514b57"/>
-          <path className="jogger-near-arm" d="m27 30 8 12 7-9"/>
-          <path className="jogger-near-leg" d="m23 48 12 16-8 19"/>
-          <path d="m24 81 7 1 4 5H23m-3-10 6 5-2 4-9-7" fill="#ece8df" stroke="#6d6574" strokeWidth="1.5"/>
+      <svg className="moving-jogger" viewBox="0 0 60 110">
+        <ellipse cx="27" cy="106" rx="16" ry="1.7" fill="#e5e1e9"/>
+        <g className="jogger-body" strokeLinecap="round" strokeLinejoin="round">
+          <g className="jogger-far-leg">
+            <path d="M24 53Q21 65 12 75L25 85" fill="none" stroke="#aaa3ae" strokeWidth="7"/>
+            <path d="m24 81 4 4 3 1q3 2 0 4l-5 1-8-7Z" fill="#f1eee7" stroke="#a39ba9" strokeWidth=".8"/>
+          </g>
+          <path d="M24 31 14 45 6 40" fill="none" stroke="#bca28e" strokeWidth="5"/>
+          <g className="jogger-near-leg">
+            <path d="M25 55Q32 63 40 74L28 99" fill="none" stroke="#8c8494" strokeWidth="7"/>
+            <path d="m25 96 6 2 1 3 8 3q2 3-1 4H24q-2-2 1-12Z" fill="#f3f0e8" stroke="#9b92a2" strokeWidth=".8"/>
+            <path d="M25 105h14" fill="none" stroke="#b8b1bf" strokeWidth="1"/>
+          </g>
+          <path d="M21 47q6 1 11 5l-3 10-11-2-3-7Z" fill="#8e8798"/>
+          <path d="m28 19-2 9 8 2 2-11Z" fill="#bca18d"/>
+          <path d="M25 26q5-3 11 1l-1 13-9 14q-6 1-12-3l7-18Z" fill="#bec5be" stroke="#a1aaa1" strokeWidth=".8"/>
+          <path d="m24 32 7 4 3-7q-5-6-10 3Z" fill="#b1bbb1"/>
+          <path d="M30 9q0-7 7-7 8 0 8 9l2 4-4 1-1 7q-5 3-10-3Z" fill="#bca18d" stroke="#a28b7c" strokeWidth=".7"/>
+          <path d="M30 15q-5-6-1-12 3-5 11-3 7 1 7 8l-13-2-1 8Z" fill="#817b85"/>
+          <path d="M33 13q-3-2-3 1t3 3" fill="none" stroke="#a28b7c" strokeWidth=".8"/>
+          <circle cx="42" cy="11" r=".65" fill="#77707b"/>
+          <path d="m39 19 3 .2" stroke="#a28b7c" strokeWidth=".7"/>
+          <g className="jogger-near-arm">
+            <path d="m29 33 11 13 11-11" fill="none" stroke="#bca18d" strokeWidth="5.5"/>
+            <path d="m49 36 2-4q2-2 4 0l-1 5-3 2" fill="#bca18d"/>
+          </g>
         </g>
       </svg>
     </div>
