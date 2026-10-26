@@ -9,5 +9,6 @@ export function hashToken(token:string){return createHash('sha256').update(token
 export async function verifyOrder(reference:string){if(!/^raygan_[a-f0-9]{32}$/.test(reference))throw new HttpError(400,'Invalid payment reference.');const db=database();const {data:order,error}=await db.from('bookings').select('*').eq('reference',reference).single();if(error||!order)throw new HttpError(404,'Booking not found.');
   const transaction=await paystack<Transaction>(`/transaction/verify/${encodeURIComponent(reference)}`);
   if(!matchesTransaction(transaction,{reference,amount:order.amount,email:order.email}))throw new HttpError(transaction.status==='success'?409:402,transaction.status==='success'?'Payment details do not match this booking. Please contact us.':'Payment has not been confirmed yet. If you paid, wait a moment and try again.');
-  const {error:updateError}=await db.from('bookings').update({status:'paid',paid_at:transaction.paid_at||new Date().toISOString()}).eq('reference',reference).neq('status','paid');if(updateError)throw new HttpError(503,'Your payment is being recorded. Please try again shortly.');return {...order,status:'paid',paid_at:transaction.paid_at};
+  const paidAt=transaction.paid_at||order.paid_at||new Date().toISOString();
+  const {error:updateError}=await db.from('bookings').update({status:'paid',paid_at:paidAt}).eq('reference',reference).neq('status','paid');if(updateError)throw new HttpError(503,'Your payment is being recorded. Please try again shortly.');return {...order,status:'paid',paid_at:paidAt};
 }
