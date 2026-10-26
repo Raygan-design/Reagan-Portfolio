@@ -37,7 +37,7 @@ const availabilitySchema=z.object({date:z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 export const bookingSchema=z.object({
   requestId:z.uuid(),service:z.enum(serviceIds),duration:z.union([z.literal(30),z.literal(60)]),
   name:z.string().trim().min(2).max(120),email:z.email().max(254),phone:z.union([z.literal(''),z.string().trim().regex(/^\+[0-9]{7,15}$/,'Enter a valid phone number with its country code.').refine(isPossiblePhoneNumber,'Check your phone number and country code.')]),
-  timeZone:z.string().refine(validTimezone,'Choose a valid time zone.'),work:z.string().trim().min(3).max(3000),goal:z.string().trim().min(10).max(5000),
+  timeZone:z.string().refine(validTimezone,'Choose a valid time zone.'),work:z.string().trim().max(5000).default(''),goal:z.string().trim().max(5000).default(''),
   selectedSlot:z.iso.datetime().optional(),availability:z.array(availabilitySchema).min(1).max(3),material:z.union([z.literal(''),z.url().max(2000).refine(v=>v.startsWith('https://'),'Use a secure https link.')]).default(''),website:z.string().max(0).optional(),
 }).superRefine((data,ctx)=>{
   if(data.selectedSlot?data.availability.length!==1:data.availability.length!==3)ctx.addIssue({code:'custom',path:['availability'],message:data.selectedSlot?'Choose one available session.':'Choose three preferred options.'});
