@@ -1,20 +1,14 @@
-import {timingSafeEqual,randomBytes} from 'node:crypto';
+import {randomBytes} from 'node:crypto';
 import {NextResponse} from 'next/server';
 import {bookingSchema} from '@/lib/validation';
 import {priceInPesewas} from '@/lib/catalog';
 import {consultationConfirmation,type PaidBooking} from '@/lib/booking-notifications';
 import {checkOrigin,errorResponse,HttpError,rateLimit,readJson} from '@/lib/server/http';
-
-function validToken(value:unknown){
- const expected=process.env.BOOKING_PREVIEW_TOKEN;
- if(typeof value!=='string'||!expected)return false;
- const supplied=Buffer.from(value),known=Buffer.from(expected);
- return supplied.length===known.length&&timingSafeEqual(supplied,known);
-}
+import {validPrivateBookingToken} from '@/lib/server/private-booking-test';
 
 export async function POST(request:Request){try{
  checkOrigin(request);await rateLimit(request,'booking-preview',5);
- const body=await readJson(request);if(!validToken(body.token))throw new HttpError(404,'This private preview link is not available.');
+ const body=await readJson(request);if(!validPrivateBookingToken(body.token))throw new HttpError(404,'This private preview link is not available.');
  const parsed=bookingSchema.safeParse(body.input);if(!parsed.success)throw new HttpError(400,parsed.error.issues[0].message);
  const input=parsed.data;if(!input.selectedSlot)throw new HttpError(400,'Choose an available appointment time.');
  const booking:PaidBooking={reference:`raygan_${randomBytes(16).toString('hex')}`,status:'paid',name:input.name,email:input.email,phone:input.phone,service:input.service,duration:input.duration,amount:priceInPesewas(input.duration),currency:'GHS',time_zone:input.timeZone,work:input.work,goal:input.goal,material:input.material,availability:input.availability,paid_at:new Date().toISOString(),scheduled_start:input.selectedSlot,scheduled_end:new Date(+new Date(input.selectedSlot)+input.duration*60000).toISOString(),schedule_status:'confirmed',meeting_url:'https://meet.google.com/landing'};

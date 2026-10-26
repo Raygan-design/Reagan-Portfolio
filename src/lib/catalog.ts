@@ -16,5 +16,6 @@ export type Duration = typeof durations[number];
 export const prices: Record<Duration, number> = {30: 750, 60: 1200};
 export const sessionNames: Record<Duration, string> = {30: 'Strategy Call', 60: 'Strategy Call'};
 export function priceInPesewas(duration: Duration) { return prices[duration] * 100; }
+export function checkoutAmountInPesewas(duration:Duration,privateTest=false){return privateTest?100:priceInPesewas(duration)}
 export function money(amount: number) { return `GHS ${new Intl.NumberFormat('en-GH',{maximumFractionDigits:2}).format(amount)}`; }
 export function serviceById(id: string) { return services.find(service => service.id === id); }
