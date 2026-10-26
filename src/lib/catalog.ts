@@ -14,7 +14,7 @@ export const services = serviceIds.map((id, i) => ({id, number: String(i + 1).pa
 export const durations = [30, 60] as const;
 export type Duration = typeof durations[number];
 export const prices: Record<Duration, number> = {30: 750, 60: 1002};
-export const sessionNames: Record<Duration, string> = {30: 'Clarity Conversation', 60: 'Strategy Conversation'};
+export const sessionNames: Record<Duration, string> = {30: 'Conversation', 60: 'Conversation'};
 export function priceInPesewas(duration: Duration) { return prices[duration] * 100; }
 export function money(amount: number) { return `GHS ${new Intl.NumberFormat('en-GH',{maximumFractionDigits:2}).format(amount)}`; }
 export function serviceById(id: string) { return services.find(service => service.id === id); }
