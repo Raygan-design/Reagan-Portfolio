@@ -14,6 +14,18 @@ export function consultationSlots(date:string,duration:30|60,busy:BusyTime[],now
  }
  return slots;
 }
+export function consultationDates(month:string,duration:30|60,busy:BusyTime[],now=Date.now()){
+ if(!/^\d{4}-\d{2}$/.test(month))return [];
+ const first=new Date(`${month}-01T00:00:00Z`);
+ if(!Number.isFinite(+first)||first.toISOString().slice(0,7)!==month)return [];
+ const next=new Date(Date.UTC(first.getUTCFullYear(),first.getUTCMonth()+1,1));
+ const dates:string[]=[];
+ for(let day=new Date(first);day<next;day=new Date(+day+86400000)){
+  const date=day.toISOString().slice(0,10);
+  if(consultationSlots(date,duration,busy,now).length)dates.push(date);
+ }
+ return dates;
+}
 export function isConsultationSlot(start:string,duration:30|60,now=Date.now()){
  const d=new Date(start);return Number.isFinite(+d)&&consultationSlots(d.toISOString().slice(0,10),duration,[],now).includes(d.toISOString());
 }

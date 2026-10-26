@@ -2,7 +2,7 @@ import 'server-only';
 import {database,ConfigurationError} from './db';
 import {HttpError} from './http';
 import {openCalendarToken} from '../calendar-crypto';
-import {consultationSlots,type BusyTime} from '../calendar-policy';
+import {consultationDates,consultationSlots,type BusyTime} from '../calendar-policy';
 export const CALENDAR_OWNER='raymarfo184@gmail.com';
 export const CALENDAR_REDIRECT='https://www.reaganmarfo.com/api/calendar/callback';
 export const CALENDAR_SCOPES=['openid','email','https://www.googleapis.com/auth/calendar.events.owned','https://www.googleapis.com/auth/calendar.freebusy'];
@@ -32,13 +32,20 @@ export async function calendarRequest<T>(path:string,body?:unknown,method?:strin
  const response=await fetch(`https://www.googleapis.com/calendar/v3${path}`,{method:method||(body?'POST':'GET'),headers:{Authorization:`Bearer ${access}`,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,cache:'no-store',signal:AbortSignal.timeout(12000)});
  if(!response.ok)throw new HttpError([404,409].includes(response.status)?response.status:503,'Calendar scheduling is temporarily unavailable.');return response.json();
 }
-export async function availableSlots(date:string,duration:30|60,excludeReference?:string){
- const start=new Date(`${date}T00:00:00Z`),end=new Date(+start+86400000);
+async function busyBetween(start:Date,end:Date,excludeReference?:string){
  const result=await calendarRequest<{calendars:Record<string,{busy:BusyTime[];errors?:unknown[]}>}>('/freeBusy',{timeMin:new Date(+start-1800000).toISOString(),timeMax:new Date(+end+1800000).toISOString(),items:[{id:CALENDAR_OWNER}]});
  const calendar=result.calendars[CALENDAR_OWNER];if(!calendar||calendar.errors?.length)throw new HttpError(503,'Could not check calendar availability.');
  let query=database().from('consultation_slots').select('start_at,end_at,status,expires_at').in('status',['held','confirmed']).lt('start_at',end.toISOString()).gt('blocked_until',start.toISOString());
  if(excludeReference)query=query.neq('reference',excludeReference);
  const {data,error}=await query;if(error)throw new HttpError(503,'Could not check reserved sessions.');
  const held=(data||[]).filter(s=>s.status==='confirmed'||+new Date(s.expires_at)>Date.now()).map(s=>({start:s.start_at,end:s.end_at}));
- return consultationSlots(date,duration,[...calendar.busy,...held]);
+ return [...calendar.busy,...held];
+}
+export async function availableSlots(date:string,duration:30|60,excludeReference?:string){
+ const start=new Date(`${date}T00:00:00Z`),end=new Date(+start+86400000);
+ return consultationSlots(date,duration,await busyBetween(start,end,excludeReference));
+}
+export async function availableDates(month:string,duration:30|60){
+ const start=new Date(`${month}-01T00:00:00Z`),end=new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+1,1));
+ return consultationDates(month,duration,await busyBetween(start,end));
 }
