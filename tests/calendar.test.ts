@@ -21,6 +21,13 @@ test('calendar busy periods enforce a 30-minute gap on both sides',()=>{
  assert.ok(slots.includes('2026-10-26T13:30:00.000Z'));
  assert.deepEqual(consultationSlots('2026-12-31',30,[],now),[]);
 });
+test('same-day appointments require at least two hours notice',()=>{
+ const onePm=Date.parse('2026-10-26T13:00:00Z');
+ const slots=consultationSlots('2026-10-26',30,[],onePm);
+ assert.ok(!slots.includes('2026-10-26T13:30:00.000Z'));
+ assert.ok(!slots.includes('2026-10-26T14:30:00.000Z'));
+ assert.ok(slots.includes('2026-10-26T15:00:00.000Z'));
+});
 test('month availability contains only dates that still have at least one valid slot',()=>{
  const fullyBusy={start:'2026-10-28T10:30:00Z',end:'2026-10-28T16:30:00Z'};
  const dates=consultationDates('2026-10',30,[fullyBusy],now);

@@ -8,7 +8,7 @@ export function consultationSlots(date:string,duration:30|60,busy:BusyTime[],now
  const slots:string[]=[];
  for(let minute=11*60;minute+duration<=16*60;minute+=duration){
   const start=+day+minute*60000,end=start+duration*60000;
-  if(start<=now+60*60000)continue;
+  if(start<now+120*60000)continue;
   if(busy.some(b=>start<+new Date(b.end)+BUFFER_MINUTES*60000&&end+BUFFER_MINUTES*60000>+new Date(b.start)))continue;
   slots.push(new Date(start).toISOString());
  }
