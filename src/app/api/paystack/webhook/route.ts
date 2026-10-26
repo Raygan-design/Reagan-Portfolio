@@ -1,3 +1,4 @@
+export const maxDuration=60;
 import {deliverBookingNotifications} from '@/lib/server/booking-notifications';
 import {sendSupportThankYou} from '@/lib/server/support-email';
 import { NextResponse } from 'next/server';

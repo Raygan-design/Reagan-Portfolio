@@ -149,3 +149,5 @@
 @keyframes traffic-sage{0%,25%{left:-190px}45%,100%{left:100%}}
 @keyframes traffic-return{0%,50%{right:-150px}70%,100%{right:100%}}
 @keyframes traffic-cycle{0%,75%{left:-130px}97%,100%{left:100%}}
+
+.calendar-slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:12px;margin:16px 0}.calendar-slots button{min-height:48px}.consultation-calendar>.availability-hint{margin-bottom:20px}

@@ -3,6 +3,7 @@ import {randomUUID} from 'node:crypto';
 import {database} from './db';
 import {HttpError} from './http';
 import {dashFormsBooking,consultationConfirmation,type PaidBooking} from '../booking-notifications';
+import {finalizeCalendarBooking} from './calendar-booking';
 
 type Channel='dashforms'|'email';
 async function deliver(booking:PaidBooking,channel:Channel){
@@ -31,6 +32,7 @@ async function deliver(booking:PaidBooking,channel:Channel){
  }
 }
 export async function deliverBookingNotifications(booking:PaidBooking){
+ booking=await finalizeCalendarBooking(booking);
  const results=await Promise.allSettled([deliver(booking,'dashforms'),deliver(booking,'email')]);
  if(results.some(r=>r.status==='rejected'))throw new HttpError(503,'Booking notifications will be retried.');
 }

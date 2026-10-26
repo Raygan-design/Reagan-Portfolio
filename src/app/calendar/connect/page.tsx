@@ -1,0 +1,2 @@
+export const dynamic='force-dynamic';
+export default function CalendarConnect(){return <main id="main" className="booking-main"><p className="eyebrow">TEAM RAYGAN · CALENDAR SETUP</p><h1>Connect your consultation calendar.</h1><p className="mt-8 max-w-xl">Only Reagan’s Google account can complete this connection. The website will check busy times and create paid consultation invitations in Reagan’s Meetings.</p><form method="post" action="/api/calendar/connect" className="mt-8"><button className="button" type="submit">CONNECT GOOGLE CALENDAR</button></form></main>}

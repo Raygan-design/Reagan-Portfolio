@@ -1,0 +1,1 @@
+export default function CalendarConnected(){return <main id="main" className="booking-main"><p className="eyebrow">TEAM RAYGAN</p><h1>Calendar connected.</h1><p className="mt-8">Reagan’s Meetings is connected for consultation availability and paid booking invitations.</p><a href="/consulting" className="button mt-8">BACK TO CONSULTING</a></main>}
