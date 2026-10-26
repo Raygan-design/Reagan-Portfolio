@@ -5,7 +5,7 @@ export const site = {
     {label: 'Instagram', href: process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/rayganofficial'},
     {label: 'TikTok', href: 'https://www.tiktok.com/@rayganofficial'},
     {label: 'X', href: 'https://x.com/rayganofficial'},
-    {label: 'LinkedIn', href: process.env.NEXT_PUBLIC_LINKEDIN_URL},
+    {label: 'LinkedIn', href: process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/in/reaganmarfo/'},
     {label: 'YouTube', href: process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/@officialraygan'},
     {label: 'Team Raygan', href: process.env.NEXT_PUBLIC_TEAM_RAYGAN_URL || 'https://teamraygan.com/'},
   ],
