@@ -6,7 +6,7 @@ export function consultationSlots(date:string,duration:30|60,busy:BusyTime[],now
  const day=new Date(`${date}T00:00:00Z`);
  if(!Number.isFinite(+day)||day.toISOString().slice(0,10)!==date||[0,6].includes(day.getUTCDay())||+day>now+60*86400000)return [];
  const slots:string[]=[];
- for(let minute=11*60;minute+duration<=16*60;minute+=30){
+ for(let minute=11*60;minute+duration<=16*60;minute+=duration){
   const start=+day+minute*60000,end=start+duration*60000;
   if(start<=now+60*60000)continue;
   if(busy.some(b=>start<+new Date(b.end)+BUFFER_MINUTES*60000&&end+BUFFER_MINUTES*60000>+new Date(b.start)))continue;

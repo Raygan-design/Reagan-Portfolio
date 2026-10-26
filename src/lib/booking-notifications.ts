@@ -28,7 +28,7 @@ export function consultationConfirmation(booking:PaidBooking){
  const confirmed=b.schedule_status==='confirmed';
  const appointment=confirmed&&b.scheduled_start?new Intl.DateTimeFormat('en-GB',{timeZone:b.time_zone,weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'short'}).format(new Date(b.scheduled_start)):times;
  const subject=confirmed?'Your consultation is booked — Team Raygan':'Your consultation request is in — Team Raygan';
- const next=confirmed?'Your appointment is confirmed. A Google Calendar invitation is on its way to this email address.':b.schedule_status==='needs_reschedule'?'Your payment has been received, but the selected time became unavailable. I’ll contact you on WhatsApp to arrange another time. Please do not pay again.':'These times are requests, not confirmed appointments. I’ll contact you on WhatsApp to agree on the final date and time, then send your calendar invitation.';
+ const next=confirmed?'Your appointment is confirmed. A Google Calendar invitation is on its way to this email address.':b.schedule_status==='needs_reschedule'?'Your payment has been received, but the selected time became unavailable. I’ll email you to arrange another time. Please do not pay again.':'These times are requests, not confirmed appointments. I’ll email you to agree on the final date and time, then send your calendar invitation.';
  const heading=confirmed?'Your consultation is booked.':'Your consultation request is in.';
  const timeLabel=confirmed?'Your appointment':'Your preferred times';
  const join=b.meeting_url&&/^https:\/\/meet\.google\.com\//.test(b.meeting_url)?b.meeting_url:'';
