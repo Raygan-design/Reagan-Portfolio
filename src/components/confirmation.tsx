@@ -1,5 +1,4 @@
 'use client';
-import {Arrow} from '@/components/arrow';
 import {useCallback,useEffect,useState} from 'react';
 import Link from 'next/link';
 import {BookingHeader,PreferredTimes} from './booking';
@@ -27,7 +26,7 @@ export function Confirmation({reference}:{reference:string}){
      <p className="eyebrow">{booked?'PAID · APPOINTMENT CONFIRMED':'PAID · REQUEST RECEIVED'}</p>
      <h2>{serviceById(receipt.service)?.title}</h2>
      <p>{receipt.duration}-minute {sessionNames[receipt.duration]} · {money(receipt.amount/100)}</p>
-     <div className="confirmation-next"><p className="eyebrow">WHAT HAPPENS NEXT</p><p>{booked?'Your confirmation email and calendar invitation include your appointment time and joining details.':pending?'We’re finishing your calendar invitation. This page will check again shortly.':reschedule?'We’ll email you to arrange a replacement time.':'We’ll email you to agree on one of your preferred times and send the final calendar invitation.'}{booked&&receipt.meetingUrl?.startsWith('https://meet.google.com/')&&<><br/><a href={receipt.meetingUrl} target="_blank" rel="noreferrer">JOIN THE CONVERSATION <Arrow/></a></>}</p></div>
+     <div className="confirmation-next"><p className="eyebrow">WHAT HAPPENS NEXT</p><p>{booked?'Your confirmation email and calendar invitation include your appointment time and joining details.':pending?'We’re finishing your calendar invitation. This page will check again shortly.':reschedule?'We’ll email you to arrange a replacement time.':'We’ll email you to agree on one of your preferred times and send the final calendar invitation.'}</p></div>
     </section>
     <aside className="booking-sidebar">
      <p className="eyebrow">{booked?'YOUR APPOINTMENT':'YOUR REQUESTED TIMES'}</p>
