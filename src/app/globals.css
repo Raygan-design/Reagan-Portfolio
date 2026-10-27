@@ -197,4 +197,24 @@
 /* Album cards: a slim bar with just the event name and View album. */
 .event-album-meta{flex:1;min-height:68px;padding:16px 22px}
 @media(max-width:600px){.event-album-meta{min-height:60px;padding:14px 18px}}
-.video-dialog .video-embed{display:block;width:100%;aspect-ratio:16/9;max-height:75dvh;border:0}
+/* Story film: a cinematic full-screen modal. The film rises in over a blurred navy backdrop. */
+.film-modal{--film-w:min(1180px,100%,calc((100dvh - 210px) * 16 / 9));width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;padding:24px;border:0;background:transparent;color:#fff;overflow:hidden}
+.film-modal[open]{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.film-modal::backdrop{background:#00002ee8;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.film-modal-bar{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;width:var(--film-w)}
+.film-modal-bar .eyebrow{display:block;margin:0 0 6px;color:#c9baff}
+.film-modal-bar strong{display:block;font-size:clamp(20px,2.4vw,30px);line-height:1.15;font-weight:700}
+.film-modal-close{display:inline-flex;align-items:center;gap:10px;flex-shrink:0;padding:10px 16px;border:1px solid #ffffff59;border-radius:999px;background:transparent;color:#fff;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:background-color .2s ease,color .2s ease}
+.film-modal-close span{font-size:18px;line-height:1;font-weight:400}
+.film-modal-close:hover{background:#fff;color:var(--night)}
+.film-modal-frame{width:var(--film-w);aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 40px 100px -20px #000000b3,0 0 0 1px #ffffff1f}
+.film-modal-frame iframe{display:block;width:100%;height:100%;border:0}
+.film-modal-link{display:inline-flex;align-items:center;gap:8px;color:#ffffffb3;font-size:11px;font-weight:700;letter-spacing:.1em;text-decoration:none;transition:color .2s ease}
+.film-modal-link:hover{color:#fff}
+.film-modal[open]::backdrop{animation:film-fade .35s ease-out}
+.film-modal[open] .film-modal-bar,.film-modal[open] .film-modal-link{animation:film-fade .5s ease-out .15s backwards}
+.film-modal[open] .film-modal-frame{animation:film-rise .6s cubic-bezier(.22,1,.36,1) .05s backwards}
+@keyframes film-fade{from{opacity:0}}
+@keyframes film-rise{from{opacity:0;transform:translateY(28px) scale(.96)}}
+@media(max-width:600px){.film-modal{padding:16px;--film-w:100%}.film-modal-frame{border-radius:10px}.film-modal-close{padding:9px 13px}}
+@media(prefers-reduced-motion:reduce){.film-modal[open]::backdrop,.film-modal[open] .film-modal-bar,.film-modal[open] .film-modal-link,.film-modal[open] .film-modal-frame{animation:none}}
