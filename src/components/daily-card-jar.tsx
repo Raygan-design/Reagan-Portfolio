@@ -8,10 +8,11 @@ const storageKey = 'raygan-daily-card';
 // Each day's card is one of the jar's note colours. The same colour is used for the note
 // that leaves the jar, the card it grows into, and the downloaded image.
 // Light, sticky-note shades so the dark handwriting stands out.
+// Each colour has its own matching ink (main text) and soft ink (signature, small print).
 const tones = [
-  {paper: '#fff1b8', shadow: '#ad93ff', soft: '#5b4a9e'},
-  {paper: '#ffdcc2', shadow: '#ad93ff', soft: '#5b4a9e'},
-  {paper: '#e6ddff', shadow: '#ad93ff', soft: '#4b3c8c'},
+  {paper: '#fff1b8', shadow: '#ad93ff', ink: '#46370c', soft: '#7a5a10'},
+  {paper: '#ffdcc2', shadow: '#ad93ff', ink: '#5a2412', soft: '#8a3a1a'},
+  {paper: '#e6ddff', shadow: '#ad93ff', ink: '#2a1d6e', soft: '#4b3c8c'},
 ];
 type Tone = typeof tones[number];
 
@@ -35,12 +36,16 @@ function shuffled(count: number, seed: number) {
   for (let i = count - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
   return order;
 }
+// A card is either Reagan's own words (plain text) or a quote: {"text": "…", "by": "Author Name"}.
+type Card = string | {text: string; by: string};
 function today() {
   const now = new Date(), seed = visitorSeed();
   const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
   const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const label = now.toLocaleDateString('en-GB', {weekday: 'long', day: 'numeric', month: 'long'});
-  return {key, label, message: cards[shuffled(cards.length, seed)[day % cards.length]], tone: tones[(day + seed) % tones.length]};
+  const entry = (cards as Card[])[shuffled(cards.length, seed)[day % cards.length]];
+  const [message, by] = typeof entry === 'string' ? [entry, 'Raygan'] : [entry.text, entry.by];
+  return {key, label, message, by, tone: tones[(day + seed) % tones.length]};
 }
 type Today = ReturnType<typeof today>;
 type Phase = 'idle' | 'opening' | 'open' | 'closing';
@@ -115,7 +120,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
 
 // Draws what the visitor sees, at 1080×1350 (the size Instagram and WhatsApp handle best):
 // the sketch card with its purple offset shadow, sitting above the jar.
-async function renderCard({message, label, tone}: Today) {
+async function renderCard({message, by, label, tone}: Today) {
   await Promise.all([document.fonts.load("72px 'Oooh Baby'"), document.fonts.load("700 28px 'Bricolage Grotesque Variable'"), document.fonts.load("400 28px 'Bricolage Grotesque Variable'")]);
   const W = 1080, H = 1350, s = 2.6875, cardW = 320 * s, pad = 24 * s, canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
@@ -144,11 +149,11 @@ async function renderCard({message, label, tone}: Today) {
   ctx.strokeStyle = '#000047'; ctx.lineWidth = 2 * s; ctx.stroke();
   ctx.globalAlpha = .3; ctx.lineWidth = s; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 4 * s, cardW - 8 * s, cardH - 8 * s, inner); ctx.stroke(); ctx.globalAlpha = 1;
 
-  let y = -cardH + 26 * s; ctx.fillStyle = '#000047'; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+  let y = -cardH + 26 * s; ctx.fillStyle = tone.ink; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
   date(); dateLines.forEach(line => { ctx.fillText(line, pad, y + 2 * s); y += 16 * s; });
   y += 14 * s; ctx.letterSpacing = '0px'; ctx.font = `${size}px 'Oooh Baby'`;
   lines.forEach(line => { ctx.fillText(line, pad, y + size * .1); y += size * 1.25; });
-  y += 8 * s; ctx.font = `${26 * s}px 'Oooh Baby'`; ctx.fillStyle = tone.soft; ctx.textAlign = 'right'; ctx.fillText('— Raygan', cardW - pad - 4 * s, y + 4 * s);
+  y += 8 * s; ctx.font = `${26 * s}px 'Oooh Baby'`; ctx.fillStyle = tone.soft; ctx.textAlign = 'right'; ctx.fillText(`— ${by}`, cardW - pad - 4 * s, y + 4 * s);
   y += 39 * s + 14 * s; ctx.font = `400 ${12 * s}px 'Bricolage Grotesque Variable'`; ctx.fillStyle = tone.soft; ctx.textAlign = 'center';
   ctx.fillText('Pick your card at reaganmarfo.com', cardW / 2, y);
   ctx.restore();
@@ -249,7 +254,7 @@ export function DailyCardJar() {
     if (!card) return; setBusy('share'); setNotice('');
     try {
       const blob = await cardImage(), file = new File([blob], `raygan-card-${card.key}.png`, {type: 'image/png'});
-      const text = `${card.message} — Raygan`;
+      const text = `${card.message} — ${card.by}`;
       if (navigator.canShare?.({files: [file]})) await navigator.share({files: [file], title: 'My card from Raygan', text});
       else if (navigator.share) await navigator.share({title: 'My card from Raygan', text, url: location.origin});
       else { download(blob, file.name); setNotice('Saved the image so you can share it.'); }
@@ -279,12 +284,12 @@ export function DailyCardJar() {
   const showCard = phase === 'open' || phase === 'closing';
   return <>
     <div className={`card-overlay ${phase}`} aria-hidden="true"/>
-    <div ref={root} style={card ? {'--card-paper': card.tone.paper, '--card-shadow': card.tone.shadow, '--card-soft': card.tone.soft} as React.CSSProperties : undefined} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}${tucked && phase === 'idle' ? ' tucked' : ''}`}>
+    <div ref={root} style={card ? {'--card-paper': card.tone.paper, '--card-shadow': card.tone.shadow, '--card-soft': card.tone.soft, '--card-ink': card.tone.ink} as React.CSSProperties : undefined} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}${tucked && phase === 'idle' ? ' tucked' : ''}`}>
     {card && showCard && <section className="card-pop" role="dialog" aria-label={`Your card for ${card.label}`}>
       <button ref={closeButton} type="button" className="card-pop-close" onClick={() => close()} aria-label="Put the card back">×</button>
       <p className="card-pop-date">Your card for {card.label}</p>
       <p className="card-pop-message">{card.message}</p>
-      <p className="card-pop-signature">— Raygan</p>
+      <p className="card-pop-signature">— {card.by}</p>
       <div className="card-pop-actions">
         <button type="button" onClick={share} disabled={!!busy}>{busy === 'share' ? 'Preparing…' : 'Share'}</button>
         <button type="button" onClick={save} disabled={!!busy}>{busy === 'download' ? 'Saving…' : 'Download'}</button>
