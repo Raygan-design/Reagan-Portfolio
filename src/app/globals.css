@@ -227,3 +227,10 @@
 .contact-content .eyebrow{margin:0 0 16px}
 .contact-content h1{font-size:32px;margin-bottom:24px}
 @media(max-width:760px){.contact-content h1{font-size:30px;line-height:34px}}
+/* Paths: a proper heading like Ventures, with the rows set off by a light rule instead of the heavy ink line. */
+.paths-section{padding-top:64px;padding-bottom:64px}
+.paths-section>.section-heading{border-bottom:0;padding-bottom:0}
+.paths-section>.section-heading .eyebrow{font-size:12px;letter-spacing:.12em}
+.paths-section>.section-heading+.path-row{margin-top:64px;border-top:1px solid var(--line)}
+@media(max-width:760px){.paths-section{padding-top:56px;padding-bottom:56px}.paths-section>.section-heading+.path-row{margin-top:32px}}
+@media(min-width:1101px){.path-row{grid-template-columns:minmax(0,1fr) minmax(0,2fr) 230px}.path-row>.button,.path-row>.text-button{justify-self:end}}
