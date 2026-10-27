@@ -172,3 +172,5 @@
 @media(hover:hover) and (pointer:fine){.event-album-card:hover .event-album-cover img{transform:scale(1.025)}.event-album-card:hover .event-album-meta{background:#1a1a66}}
 @media(max-width:900px){.event-album-grid{grid-template-columns:1fr 1fr}.event-album-card:last-child{grid-column:1 / -1}.event-album-cover{height:430px}}
 @media(max-width:600px){.event-albums>.section-heading{align-items:flex-start}.event-album-grid{grid-template-columns:1fr;gap:18px;margin-top:22px}.event-album-card:last-child{grid-column:auto}.event-album-cover{height:410px}.event-album-meta{min-height:96px;padding:17px 18px}.event-album-meta strong{font-size:19px}.event-album-viewer>header,.event-album-viewer>footer{padding:14px 16px;gap:12px}.event-album-viewer>header h2{font-size:24px;line-height:29px}.event-album-viewer>footer .gallery-hint{display:none}.event-album-viewer>footer .icon-button{width:42px;height:42px}}
+
+.work-album.work-album-clean{grid-template-columns:1.2fr 1fr}.work-album.work-album-clean .mentorship{grid-column:auto}
