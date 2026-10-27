@@ -7,6 +7,11 @@ import {site} from '@/lib/site';
 
 export const metadata:Metadata={title:'Speaking + Hosting'};
 
+const reels=[
+  {title:'The Becoming Experience',src:'/videos/the-becoming-experience.mp4',poster:'/images/reels/the-becoming-experience.jpg',length:'00:31'},
+  {title:'Building in Africa',src:site.reels[1],length:'00:31'},
+  {title:'Think Bigger',src:site.reels[2],length:'00:54'},
+];
 export default function Speaking(){
  const images=paper['1A7-0'].images;
  const albums:EventAlbum[]=[
@@ -18,7 +23,7 @@ export default function Speaking(){
   <section className="section speaking-hero"><div><p className="eyebrow">SPEAKING + EVENT HOSTING</p><h1>Ideas for rooms ready to think bigger.</h1></div><div><p>Book me to speak, join a panel, moderate a conversation or host your next gathering.</p><Link className="button" href="/speaking/enquiry">MAKE ENQUIRY <Arrow/></Link></div></section>
   <section className="section speaking-content">
    <EventAlbums albums={albums}/>
-   <div className="reels"><div className="section-heading"><h2>Portrait showreels</h2><p>Short moments from talks, panels and hosted conversations.</p></div><div className="reel-grid">{['Created to Create','Building in Africa','Think Bigger'].map((title,index)=><div className={`reel reel-${index}`} key={title}><Film src={site.reels[index]} title={`REEL 0${index+1} / ${['00:42','00:31','00:54'][index]}`}/><h3>{title}</h3></div>)}</div></div>
+   <div className="reels"><div className="section-heading"><h2>Portrait showreels</h2><p>Short moments from talks, panels and hosted conversations.</p></div><div className="reel-grid">{reels.map((reel,index)=><div className={`reel reel-${index}`} key={reel.title}><Film src={reel.src} poster={reel.poster} title={`REEL 0${index+1} / ${reel.length}`}/><h3>{reel.title}</h3></div>)}</div></div>
   </section>
  </div>;
 }
