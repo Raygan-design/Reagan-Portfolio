@@ -36,7 +36,7 @@ export function EventAlbums({albums}:{albums:EventAlbum[]}){
     <div className="section-heading"><h2>From stages and conversations</h2><span className="gallery-instruction">Choose an event to view the album</span></div>
     <div className="event-album-grid">{albums.map((item,index)=><button type="button" className="event-album-card" key={item.name} onClick={()=>open(index)} aria-label={`Open ${item.name} photo album, ${item.images.length} photos`}>
       <span className="event-album-cover"><Image src={item.images[0]} alt="" fill sizes="(max-width:700px) 92vw, 31vw"/></span>
-      <span className="event-album-meta"><span><small>{String(index+1).padStart(2,'0')} / {String(albums.length).padStart(2,'0')}</small><strong>{item.name}</strong></span><span className="event-album-open">VIEW ALBUM <Arrow/></span></span>
+      <span className="event-album-meta"><strong>{item.name}</strong><span className="event-album-open">VIEW ALBUM <Arrow/></span></span>
     </button>)}</div>
     <dialog ref={dialog} className="event-album-dialog" aria-labelledby="event-album-title" onClose={()=>setSelected(null)} onClick={event=>{if(event.target===event.currentTarget)close()}}>
       {album&&<div className="event-album-viewer" onKeyDown={event=>{if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();move(event.key==='ArrowRight'?1:-1)}}}>
