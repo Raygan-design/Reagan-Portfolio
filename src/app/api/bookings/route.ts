@@ -17,7 +17,7 @@ export async function POST(request:Request){try{
   const input=parsed.data,testPayment=validPrivateBookingToken(body.input&&typeof body.input==='object'?'testPaymentToken' in body.input?(body.input as {testPaymentToken?:unknown}).testPaymentToken:undefined:undefined),checkoutAmount=checkoutAmountInPesewas(input.duration,testPayment),db=database(),jar=await cookies();
   const {data:existing,error:findError}=await db.from('bookings').select('*').eq('request_id',input.requestId).maybeSingle();if(findError)throw new HttpError(503,'Could not retrieve your booking.');
   let order=existing;
-  if(order){if(!jar.get('raygan_booking')?.value||hashToken(jar.get('raygan_booking')!.value)!==order.access_hash)throw new HttpError(409,'This booking belongs to a different browser session. Please start a new booking.');if(order.status==='paid')throw new HttpError(409,'This booking has already been paid.');if(order.amount!==checkoutAmount)throw new HttpError(409,'Session pricing has changed. Please go back and choose your session again.');if(order.checkout_url&&!order.scheduled_start)return NextResponse.json({url:order.checkout_url});}
+  if(order){if(!jar.get('raygan_booking')?.value||hashToken(jar.get('raygan_booking')!.value)!==order.access_hash)throw new HttpError(409,'This booking belongs to a different browser session. Please start a new booking.');if(order.status==='paid')throw new HttpError(409,'This booking has already been paid.');if(order.amount!==checkoutAmount)throw new HttpError(409,'Session pricing has changed. Please go back and choose your session again.');if(order.checkout_url&&!order.scheduled_start)return NextResponse.json({url:order.checkout_url,reference:order.reference});}
   else{
     const connected=await calendarConnected();
     if(connected&&!input.selectedSlot)throw new HttpError(409,'The calendar is ready. Refresh this page and choose an available session.');
@@ -37,7 +37,7 @@ export async function POST(request:Request){try{
     const {data:held,error:holdError}=await db.rpc('hold_consultation_slot',{booking_ref:order.reference,slot_start:order.scheduled_start,slot_end:order.scheduled_end});
     if(holdError||!held)throw new HttpError(409,'Someone else has just reserved that time. Go back and choose another time.');
   }
-  if(order.checkout_url)return NextResponse.json({url:order.checkout_url});
+  if(order.checkout_url)return NextResponse.json({url:order.checkout_url,reference:order.reference});
   if(body.files.length&&!(order.attachments?.length)){
     const uploaded:{name:string;path:string;size:number}[]=[];
     try{
@@ -50,7 +50,7 @@ export async function POST(request:Request){try{
       if(error)throw new HttpError(503,'Your attachments could not be saved. Please try again.');
     }catch(error){if(uploaded.length)await db.storage.from('booking-materials').remove(uploaded.map(f=>f.path));throw error}
   }
-  const checkout=await paystack<{authorization_url:string}>('/transaction/initialize',{email:order.email,amount:order.amount,currency:'GHS',reference:order.reference,callback_url:`${base}/consulting/confirmation?reference=${order.reference}`,metadata:{service:serviceById(order.service)?.title,duration:order.duration,listed_price:priceInPesewas(order.duration),private_test:testPayment||undefined,cancel_action:`${base}/consulting/book?service=${encodeURIComponent(order.service)}`}});
+  const checkout=await paystack<{authorization_url:string}>('/transaction/initialize',{email:order.email,amount:order.amount,currency:'GHS',reference:order.reference,callback_url:`${base}/consulting/confirmation?reference=${order.reference}&service=${encodeURIComponent(order.service)}`,metadata:{service:serviceById(order.service)?.title,duration:order.duration,listed_price:priceInPesewas(order.duration),private_test:testPayment||undefined,cancel_action:`${base}/consulting/book?service=${encodeURIComponent(order.service)}&cancelled=1`}});
   const url=new URL(checkout.authorization_url);if(url.protocol!=='https:'||!(url.hostname==='checkout.paystack.com'||url.hostname.endsWith('.paystack.com')))throw new HttpError(502,'The payment provider returned an invalid checkout link.');
-  const {error:saveError}=await db.from('bookings').update({checkout_url:url.href}).eq('reference',order.reference);if(saveError)throw new HttpError(503,'Checkout could not be saved. Please try again.');return NextResponse.json({url:url.href});
+  const {error:saveError}=await db.from('bookings').update({checkout_url:url.href}).eq('reference',order.reference);if(saveError)throw new HttpError(503,'Checkout could not be saved. Please try again.');return NextResponse.json({url:url.href,reference:order.reference});
 }catch(error){return errorResponse(error)}}
