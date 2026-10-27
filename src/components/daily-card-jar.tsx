@@ -5,7 +5,7 @@ import cards from '@/content/daily-cards.json';
 
 const storageKey = 'raygan-daily-card';
 
-// Each day's card is one of the jar's note colours, and shares their straight-edged shape. The same colour is used for the note
+// Each day's card is one of the jar's note colours. The same colour is used for the note
 // that leaves the jar, the card it grows into, and the downloaded image.
 // Light, sticky-note shades so the dark handwriting stands out.
 const tones = [
@@ -95,7 +95,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
 }
 
 // Draws what the visitor sees, at 1080×1350 (the size Instagram and WhatsApp handle best):
-// the sticky-note card with its purple offset shadow, sitting above the jar.
+// the sketch card with its purple offset shadow, sitting above the jar.
 async function renderCard({message, label, tone}: Today) {
   await Promise.all([document.fonts.load("72px 'Oooh Baby'"), document.fonts.load("700 28px 'Bricolage Grotesque Variable'"), document.fonts.load("400 28px 'Bricolage Grotesque Variable'")]);
   const W = 1080, H = 1350, s = 2.6875, cardW = 320 * s, pad = 24 * s, canvas = document.createElement('canvas');
@@ -116,12 +116,14 @@ async function renderCard({message, label, tone}: Today) {
   ctx.translate(0, -Math.max(0, (cardBottom - cardH - (H - jarBottom)) / 2)); // centre the card and jar vertically
 
   ctx.save(); ctx.translate(cardX, cardBottom); ctx.rotate(-1.5 * Math.PI / 180);
-  const outer = 3 * s;
+  const outer = [{x: 255 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 255 * s}];
+  const inner = [{x: 15 * s, y: 255 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 255 * s, y: 15 * s}];
   ctx.shadowColor = '#21153b22'; ctx.shadowBlur = 40 * s; ctx.shadowOffsetY = 18 * s;
   ctx.fillStyle = tone.shadow; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 6 * s, cardW, cardH, outer); ctx.fill();
   ctx.shadowColor = 'transparent';
   ctx.fillStyle = tone.paper; ctx.beginPath(); ctx.roundRect(0, -cardH, cardW, cardH, outer); ctx.fill();
   ctx.strokeStyle = '#000047'; ctx.lineWidth = 2 * s; ctx.stroke();
+  ctx.globalAlpha = .3; ctx.lineWidth = s; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 4 * s, cardW - 8 * s, cardH - 8 * s, inner); ctx.stroke(); ctx.globalAlpha = 1;
 
   let y = -cardH + 26 * s; ctx.fillStyle = '#000047'; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
   date(); dateLines.forEach(line => { ctx.fillText(line, pad, y + 2 * s); y += 16 * s; });
@@ -150,6 +152,19 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// The notes in the jar use the same hand-drawn outline as the full card (CSS border-radius
+// 255px 15px 225px 15px / 15px 225px 15px 255px), so the note that leaves the jar is a tiny copy of it.
+function sketchNote(w: number, h: number) {
+  const x = -w / 2, y = -h / 2, [tl, tr, br, bl] = [[.8 * w, .05 * h], [.05 * w, .75 * h], [.7 * w, .05 * h], [.05 * w, .85 * h]];
+  return `M${x + tl[0]} ${y} L${x + w - tr[0]} ${y} A${tr[0]} ${tr[1]} 0 0 1 ${x + w} ${y + tr[1]} L${x + w} ${y + h - br[1]} A${br[0]} ${br[1]} 0 0 1 ${x + w - br[0]} ${y + h} L${x + bl[0]} ${y + h} A${bl[0]} ${bl[1]} 0 0 1 ${x} ${y + h - bl[1]} L${x} ${y + tl[1]} A${tl[0]} ${tl[1]} 0 0 1 ${x + tl[0]} ${y} Z`;
+}
+const jarNotes: [number, number, number, number, number, string][] = [
+  [33, 120, 20, 13, -11, '#fff1b8'], [74, 121, 22, 13, -9, '#e6ddff'], [89, 110, 17, 16, -10, '#ffdcc2'], [50, 124, 19, 9, 8, '#f2efff'],
+  [39, 105, 21, 16, -15, '#e6ddff'], [66, 111, 25, 18, -6, '#fff1b8'], [76, 94, 23, 16, 11, '#f2efff'], [44, 87, 22, 15, -9, '#ffdcc2'],
+  [32, 71, 17.5, 15, -13, '#fff1b8'], [82, 75, 22, 14, 10, '#e6ddff'], [57, 71, 20, 15, -10, '#fffdf7'], [50, 54, 20, 13, -11, '#ffdcc2'],
+  [70, 57, 20, 13, -4, '#f2efff'],
+];
+
 function Jar({paper}: {paper: string}) {
   const ink = {stroke: '#000047', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const};
   return <svg viewBox="0 0 120 140" className="card-jar-art" aria-hidden="true">
@@ -157,23 +172,9 @@ function Jar({paper}: {paper: string}) {
     <g className="card-jar-body">
       <path d="M33 34 C31.5 42 21 46 19.5 58 L18.6 116 C18.4 125 24 130 33 130.3 L87.5 130.6 C96.5 130.4 101.6 125 101.4 116.2 L100.6 58.6 C99.4 46.4 89 42.4 87.4 33.6" fill="#fbfaff" strokeWidth="2.4" {...ink}/>
       <path d="M34.6 36.5 C34 41.8 24.4 46.6 23 57.4 M86.2 36.2 C87 41.6 96.4 46 97.6 57" fill="none" strokeWidth="1.2" opacity=".35" {...ink}/>
-      <path d="M22 116 L42 112 L44 125 L24 127.6 Z" fill="#fff1b8" strokeWidth="1.8" {...ink}/>
-      <path d="M62 117 L84 113.6 L86.6 126.4 L64 128 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
-      <path d="M80 104 L97 101 L98 117 L82 118.4 Z" fill="#ffdcc2" strokeWidth="1.8" {...ink}/>
-      <path d="M41 118 L60 120.6 L58.6 129 L40 127 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
-      <path d="M27 100 L48 94.5 L51.4 110.5 L30 115.6 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
-      <path d="M30.4 104.6 L49 99.6" fill="none" strokeWidth="1" opacity=".5" {...ink}/>
-      <path d="M53 103.5 L78 101 L79.6 119 L54.6 120.6 Z" fill="#fff1b8" strokeWidth="1.8" {...ink}/>
-      <path d="M66 84 L89 88.5 L86 104 L63.4 100 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
-      <path d="M32 82 L54 78.6 L56.4 93 L34 96 Z" fill="#ffdcc2" strokeWidth="1.8" {...ink}/>
-      <path d="M22.6 66 L40 62 L42.6 77 L24 79.6 Z" fill="#fff1b8" strokeWidth="1.8" {...ink}/>
-      <path d="M72 66.6 L94 70.4 L92 84 L70.6 80 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
-      <path d="M46 66 L66 62.4 L68.6 77 L48 80 Z" fill="#fffdf7" strokeWidth="1.8" {...ink}/>
-      <path d="M38 50 L58 46 L62 58.6 L41 62.4 Z" fill="#ffdcc2" strokeWidth="1.8" {...ink}/>
-      <path d="M60 52 L80 50 L81 63 L61 64 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
-      <path className="card-jar-picked" d="M54 30 L68 24 L73 38 L58.6 43 Z" fill={paper} strokeWidth="1.8" {...ink}/>
-      <path d="M42 36 L54 40.4 L50.6 50 L39 46 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
-      <path d="M49 71.4 L66.6 68.4" fill="none" stroke="#ad93ff" strokeWidth="1.4"/>
+      {jarNotes.map(([x, y, w, h, angle, fill], i) => <path key={i} d={sketchNote(w, h)} transform={`translate(${x} ${y}) rotate(${angle})`} fill={fill} strokeWidth="1.6" {...ink}/>)}
+      <path className="card-jar-picked" d={sketchNote(15, 14)} transform="translate(63 34) rotate(-8)" fill={paper} strokeWidth="1.6" {...ink}/>
+      <path d={sketchNote(12.5, 10)} transform="translate(46.5 43) rotate(20)" fill="#e6ddff" strokeWidth="1.6" {...ink}/>
       <path d="M28.6 92 C26 78 27.4 64 33.6 55.6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
       <path d="M28.2 100 L28 104" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
     </g>
