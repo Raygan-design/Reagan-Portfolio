@@ -2,7 +2,7 @@ import {Arrow} from '@/components/arrow';
 import type {Metadata} from 'next';
 import Link from 'next/link';
 import paper from '@/content/paper.json';
-import {EventAlbums,Film,type EventAlbum} from '@/components/media';
+import {EventAlbums,Reel,type EventAlbum} from '@/components/media';
 import {site} from '@/lib/site';
 
 export const metadata:Metadata={title:'Speaking + Hosting'};
@@ -23,7 +23,7 @@ export default function Speaking(){
   <section className="section speaking-hero"><div><p className="eyebrow">SPEAKING + EVENT HOSTING</p><h1>Ideas for rooms ready to think bigger.</h1></div><div><p>Book me to speak, join a panel, moderate a conversation or host your next gathering.</p><Link className="button" href="/speaking/enquiry">MAKE ENQUIRY <Arrow/></Link></div></section>
   <section className="section speaking-content">
    <EventAlbums albums={albums}/>
-   <div className="reels"><div className="section-heading"><h2>Portrait showreels</h2><p>Short moments from talks, panels and hosted conversations.</p></div><div className="reel-grid">{reels.map((reel,index)=><div className={`reel reel-${index}`} key={reel.title}><Film src={reel.src} poster={reel.poster} title={`REEL 0${index+1} / ${reel.length}`}/><h3>{reel.title}</h3></div>)}</div></div>
+   <div className="reels"><div className="section-heading"><h2>Portrait showreels</h2><p>Short moments from talks, panels and hosted conversations.</p></div><div className="reel-grid">{reels.map((reel,index)=><Reel key={reel.title} index={index} src={reel.src} poster={'poster' in reel?reel.poster:undefined} title={reel.title} label={`REEL 0${index+1} / ${reel.length}`}/>)}</div></div>
   </section>
  </div>;
 }
