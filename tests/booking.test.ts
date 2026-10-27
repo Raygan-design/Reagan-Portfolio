@@ -9,6 +9,7 @@ const booking={requestId:'ec9a402e-77f8-4d4c-b723-a55bcb2cc7d8',service:'product
 test('server catalog charges the published consultation prices',()=>{assert.equal(priceInPesewas(30),75000);assert.equal(priceInPesewas(60),120000)});
 test('private payment tests charge one cedi without changing published prices',()=>{assert.equal(checkoutAmountInPesewas(30,true),100);assert.equal(checkoutAmountInPesewas(60,true),100);assert.equal(checkoutAmountInPesewas(30),75000);assert.equal(checkoutAmountInPesewas(60),120000)});
 test('both durations are presented as strategy calls',()=>{assert.equal(sessionNames[30],'Strategy Call');assert.equal(sessionNames[60],'Strategy Call')});
+test('consultation offers follow the published order',()=>{assert.deepEqual(services.map(service=>service.id),['podcast-strategy','creative-clarity','product-design','pick-my-mind']);assert.deepEqual(services.map(service=>service.number),['01','02','03','04'])});
 test('all four consulting offers retain four questions and their outcomes',()=>{for(const s of services){assert.equal(s.questions.length,4);assert.match(s.outcome,/^You leave with/);assert.ok(s.headline.length>10)}});
 test('valid bookings pass and client-supplied prices are discarded',()=>{const parsed=bookingSchema.parse({...booking,amount:1});assert.equal('amount' in parsed,false);assert.equal(parsed.duration,60)});
 test('calendar bookings use email as the required contact and do not require a phone number',()=>{assert.equal(bookingSchema.safeParse({...booking,phone:''}).success,true)});
