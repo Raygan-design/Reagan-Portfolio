@@ -49,3 +49,20 @@ export function EventAlbums({albums}:{albums:EventAlbum[]}){
     </dialog>
   </div>;
 }
+// A portrait showreel that plays inside its own card instead of a dialog.
+export function Reel({src,poster,label,title,index}:{src?:string;poster?:string;label:string;title:string;index:number}){
+  const video=useRef<HTMLVideoElement>(null);const [playing,setPlaying]=useState(false);const [started,setStarted]=useState(false);
+  const media=src?.startsWith('/')&&!src.startsWith('//')?src:safeExternalUrl(src);
+  // Only one reel plays at a time: starting one (by its button or its own controls) pauses the others.
+  function pauseOthers(){document.querySelectorAll<HTMLVideoElement>('.reel video').forEach(other=>{if(other!==video.current)other.pause()})}
+  function play(){setStarted(true);video.current?.play()}
+  return <div className={`reel reel-${index}${started?' started':''}${playing?' playing':''}`}>
+    <div className="film">
+      {media?<video ref={video} src={media} poster={poster} playsInline preload="metadata" controls={started} onPlay={()=>{pauseOthers();setPlaying(true);setStarted(true)}} onPause={()=>setPlaying(false)} onEnded={()=>{setPlaying(false);setStarted(false);if(video.current)video.current.currentTime=0}} aria-label={title}/>
+        :poster&&<Image src={poster} alt="" fill sizes="(max-width: 760px) 90vw, 30vw" className="film-poster"/>}
+      <span className="film-label eyebrow">{label}</span>
+      {media?<button className="play-button" onClick={play} aria-label={`Play ${title}`}>PLAY <span aria-hidden="true">▶</span></button>:<span className="reel-soon eyebrow">COMING SOON</span>}
+    </div>
+    <h3>{title}</h3>
+  </div>;
+}
