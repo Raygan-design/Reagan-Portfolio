@@ -14,10 +14,11 @@ function today() {
   return {key, label, message: cards[day % cards.length]};
 }
 type Today = ReturnType<typeof today>;
+type Phase = 'idle' | 'opening' | 'open' | 'closing';
 
 const read = () => { try { return localStorage.getItem(storageKey); } catch { return null; } };
 const write = (value: string) => { try { localStorage.setItem(storageKey, value); } catch {} };
-const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const motion = (ms: number) => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms;
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
   const lines: string[] = []; let line = '';
@@ -28,30 +29,40 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
   return line ? [...lines, line] : lines;
 }
 
+// Wobbly rectangle so the shared image matches the hand-drawn card on screen.
+function sketchRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, seed: number) {
+  const j = (n: number) => Math.sin(seed * 12.9898 + n * 78.233) * 5;
+  ctx.beginPath(); ctx.moveTo(x + j(1), y + j(2));
+  ctx.quadraticCurveTo(x + w / 2, y + j(3) - 4, x + w + j(4), y + j(5));
+  ctx.quadraticCurveTo(x + w + j(6) + 4, y + h / 2, x + w + j(7), y + h + j(8));
+  ctx.quadraticCurveTo(x + w / 2, y + h + j(9) + 4, x + j(10), y + h + j(11));
+  ctx.quadraticCurveTo(x + j(12) - 4, y + h / 2, x + j(1), y + j(2));
+}
+
 // Draws the card as a 1080×1350 portrait image, the size Instagram and WhatsApp handle best.
 async function renderCard({message, label}: Today) {
   await Promise.all([document.fonts.load("72px 'Oooh Baby'"), document.fonts.load("700 28px 'Bricolage Grotesque Variable'")]);
   const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1350;
   const ctx = canvas.getContext('2d')!;
   ctx.fillStyle = '#f2efff'; ctx.fillRect(0, 0, 1080, 1350);
-  ctx.save(); ctx.translate(540, 675); ctx.rotate(-0.012);
+  ctx.save(); ctx.translate(540, 650); ctx.rotate(-0.02);
   ctx.shadowColor = '#21153b22'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
-  ctx.fillStyle = '#fffdf7'; ctx.fillRect(-430, -560, 860, 1120);
-  ctx.shadowColor = 'transparent';
-  ctx.strokeStyle = '#e8e2d2'; ctx.lineWidth = 2;
-  for (let y = -330; y < 470; y += 74) { ctx.beginPath(); ctx.moveTo(-370, y); ctx.lineTo(370, y); ctx.stroke(); }
+  ctx.fillStyle = '#fffdf7'; sketchRect(ctx, -420, -520, 840, 1040, 1); ctx.fill();
+  ctx.shadowColor = 'transparent'; ctx.strokeStyle = '#000047'; ctx.lineWidth = 4; ctx.lineJoin = 'round';
+  sketchRect(ctx, -420, -520, 840, 1040, 1); ctx.stroke();
+  ctx.lineWidth = 2; ctx.globalAlpha = .45; sketchRect(ctx, -412, -512, 828, 1026, 2); ctx.stroke(); ctx.globalAlpha = 1;
   ctx.fillStyle = '#000047'; ctx.textAlign = 'center';
   ctx.font = "700 26px 'Bricolage Grotesque Variable'"; ctx.letterSpacing = '4px';
-  ctx.fillText(`YOUR CARD FOR ${label.toUpperCase()}`, 0, -440);
+  ctx.fillText(`YOUR CARD FOR ${label.toUpperCase()}`, 0, -420);
   ctx.letterSpacing = '0px';
-  let size = 84; ctx.font = `${size}px 'Oooh Baby'`; let lines = wrap(ctx, message, 700);
-  while (lines.length > 6 && size > 52) { size -= 6; ctx.font = `${size}px 'Oooh Baby'`; lines = wrap(ctx, message, 700); }
-  const lineHeight = size * 1.25, top = -lineHeight * (lines.length - 1) / 2 - 20;
+  let size = 88; ctx.font = `${size}px 'Oooh Baby'`; let lines = wrap(ctx, message, 680);
+  while (lines.length > 6 && size > 52) { size -= 6; ctx.font = `${size}px 'Oooh Baby'`; lines = wrap(ctx, message, 680); }
+  const lineHeight = size * 1.25, top = -lineHeight * (lines.length - 1) / 2 - 10;
   lines.forEach((text, i) => ctx.fillText(text, 0, top + i * lineHeight));
-  ctx.font = "64px 'Oooh Baby'"; ctx.fillStyle = '#6852ae'; ctx.fillText('— Raygan', 120, 400);
+  ctx.font = "64px 'Oooh Baby'"; ctx.fillStyle = '#6852ae'; ctx.fillText('— Raygan', 140, 410);
   ctx.restore();
   ctx.fillStyle = '#000047'; ctx.textAlign = 'center'; ctx.font = "700 24px 'Bricolage Grotesque Variable'"; ctx.letterSpacing = '3px';
-  ctx.fillText('RAYGAN.  ·  PICK YOUR CARD AT REAGANMARFO.COM', 540, 1300);
+  ctx.fillText('RAYGAN.  ·  PICK YOUR CARD AT REAGANMARFO.COM', 540, 1290);
   return new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Could not create image')), 'image/png'));
 }
 
@@ -61,34 +72,58 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function Jar({rising}: {rising: boolean}) {
-  return <svg viewBox="0 0 64 64" className="card-jar-art" aria-hidden="true">
-    <g className={rising ? 'card-jar-note rising' : 'card-jar-note'}><path d="M26 30 L38 28.5 L39 37 L27 38.5 Z" fill="#fffdf7" stroke="#000047" strokeWidth="1.3" strokeLinejoin="round"/><path d="M27 33.5 L38.5 32" stroke="#ad93ff" strokeWidth="1.1"/></g>
-    <path d="M20.2 18.4 C19.4 22.6 14.6 24.4 13.8 30.2 L13.4 51.6 C13.2 55.8 16.1 58.3 20.4 58.1 L43.8 58.4 C48.2 58.2 50.9 55.6 50.7 51.2 L50.2 30.4 C49.6 24.2 44.9 22.4 43.9 18.2" fill="#fbfaff" stroke="#000047" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M17 44 L27 41.5 L28.5 49 L18 51 Z" fill="#ad93ff" stroke="#000047" strokeWidth="1.2" strokeLinejoin="round"/>
-    <path d="M30 45.5 L42 44 L43 52.5 L31 53.5 Z" fill="#ffe7a8" stroke="#000047" strokeWidth="1.2" strokeLinejoin="round"/>
-    <path d="M36 37 L46 39 L44.5 46 L34.6 44.4 Z" fill="#f2efff" stroke="#000047" strokeWidth="1.2" strokeLinejoin="round"/>
-    <path d="M19.5 39.5 C18.2 34 19.6 28.6 22.8 26" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round"/>
-    <path d="M17.6 10.6 C26.1 9.7 38.2 9.9 46.5 10.5 L46.1 18 C37.1 18.6 27 18.4 17.9 17.7 Z" fill="#ad93ff" stroke="#000047" strokeWidth="1.6" strokeLinejoin="round"/>
-    <path d="M21 13.8 C28 13.2 36 13.3 43 13.9" fill="none" stroke="#000047" strokeWidth="1" strokeLinecap="round" opacity=".45"/>
+function Jar() {
+  const ink = {stroke: '#000047', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const};
+  return <svg viewBox="0 0 120 140" className="card-jar-art" aria-hidden="true">
+    <ellipse cx="60" cy="133" rx="38" ry="4.5" fill="#21153b" opacity=".12"/>
+    <g className="card-jar-body">
+      <path d="M33 34 C31.5 42 21 46 19.5 58 L18.6 116 C18.4 125 24 130 33 130.3 L87.5 130.6 C96.5 130.4 101.6 125 101.4 116.2 L100.6 58.6 C99.4 46.4 89 42.4 87.4 33.6" fill="#fbfaff" strokeWidth="2.4" {...ink}/>
+      <path d="M34.6 36.5 C34 41.8 24.4 46.6 23 57.4 M86.2 36.2 C87 41.6 96.4 46 97.6 57" fill="none" strokeWidth="1.2" opacity=".35" {...ink}/>
+      <path d="M27 100 L48 94.5 L51.4 110.5 L30 115.6 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
+      <path d="M30.4 104.6 L49 99.6" fill="none" strokeWidth="1" opacity=".5" {...ink}/>
+      <path d="M53 103.5 L78 101 L79.6 119 L54.6 120.6 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
+      <path d="M66 84 L89 88.5 L86 104 L63.4 100 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
+      <path d="M32 82 L54 78.6 L56.4 93 L34 96 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
+      <path d="M46 66 L66 62.4 L68.6 77 L48 80 Z" fill="#fffdf7" strokeWidth="1.8" {...ink}/>
+      <path d="M49 71.4 L66.6 68.4" fill="none" stroke="#ad93ff" strokeWidth="1.4"/>
+      <path d="M28.6 92 C26 78 27.4 64 33.6 55.6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
+      <path d="M28.2 100 L28 104" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
+    </g>
+    <g className="card-jar-lid">
+      <path d="M29.6 18.4 C46 16.6 74 16.8 90.6 18.6 L90 34.4 C73.6 35.6 47 35.4 30 34 Z" fill="#ad93ff" strokeWidth="2.4" {...ink}/>
+      <path d="M34 23.6 C50 22.6 70 22.8 86.4 24 M33.8 29 C50 28.2 70 28.4 86.4 29.6" fill="none" strokeWidth="1.2" opacity=".45" {...ink}/>
+      <path d="M52 18 C51 11 69 11 68.4 18" fill="none" strokeWidth="2.2" {...ink}/>
+    </g>
   </svg>;
 }
 
 export function DailyCardJar() {
   const [card, setCard] = useState<Today | null>(null);
   const [opened, setOpened] = useState(true);
-  const [phase, setPhase] = useState<'idle' | 'opening' | 'open'>('idle');
+  const [phase, setPhase] = useState<Phase>('idle');
   const [busy, setBusy] = useState<'share' | 'download' | null>(null);
   const [notice, setNotice] = useState('');
-  const dialog = useRef<HTMLDialogElement>(null);
+  const root = useRef<HTMLDivElement>(null), jar = useRef<HTMLButtonElement>(null), closeButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => { const t = today(); setCard(t); setOpened(read() === t.key); }, []);
 
   function open() {
     if (!card || phase !== 'idle') return;
-    setPhase('opening'); setNotice('');
-    setTimeout(() => { dialog.current?.showModal(); setPhase('open'); write(card.key); setOpened(true); }, reducedMotion() ? 0 : 750);
+    setPhase('opening'); setNotice(''); write(card.key);
+    setTimeout(() => { setPhase('open'); setOpened(true); closeButton.current?.focus({preventScroll: true}); }, motion(550));
   }
+  function close(returnFocus = true) {
+    setPhase(p => p === 'open' ? 'closing' : p);
+    setTimeout(() => { setPhase('idle'); if (returnFocus) jar.current?.focus({preventScroll: true}); }, motion(380));
+  }
+
+  useEffect(() => {
+    if (phase !== 'open') return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    const onPointer = (e: PointerEvent) => { if (!root.current?.contains(e.target as Node)) close(false); };
+    document.addEventListener('keydown', onKey); document.addEventListener('pointerdown', onPointer);
+    return () => { document.removeEventListener('keydown', onKey); document.removeEventListener('pointerdown', onPointer); };
+  }, [phase]);
 
   async function share() {
     if (!card) return; setBusy('share'); setNotice('');
@@ -97,37 +132,34 @@ export function DailyCardJar() {
       const text = `${card.message} — Raygan`;
       if (navigator.canShare?.({files: [file]})) await navigator.share({files: [file], title: 'My card from Raygan', text});
       else if (navigator.share) await navigator.share({title: 'My card from Raygan', text, url: location.origin});
-      else { download(blob, file.name); setNotice('Sharing isn’t available here, so we saved the image instead.'); }
-    } catch (e) { if ((e as Error).name !== 'AbortError') setNotice('Something went wrong. Try downloading the image instead.'); }
+      else { download(blob, file.name); setNotice('Saved the image so you can share it.'); }
+    } catch (e) { if ((e as Error).name !== 'AbortError') setNotice('Couldn’t share. Try downloading instead.'); }
     setBusy(null);
   }
 
   async function save() {
     if (!card) return; setBusy('download'); setNotice('');
-    try { download(await renderCard(card), `raygan-card-${card.key}.png`); setNotice('Saved. Look for it in your downloads.'); }
-    catch { setNotice('Something went wrong while saving the image.'); }
+    try { download(await renderCard(card), `raygan-card-${card.key}.png`); setNotice('Saved to your downloads.'); }
+    catch { setNotice('Couldn’t save the image.'); }
     setBusy(null);
   }
 
-  return <>
-    <button type="button" className={`card-jar${opened ? '' : ' fresh'}${phase === 'opening' ? ' opening' : ''}`} onClick={open} aria-haspopup="dialog" aria-label={opened ? 'Read today’s card again' : 'Pick today’s card'}>
-      <span className="card-jar-icon"><Jar rising={phase === 'opening'}/>{!opened && <span className="card-jar-dot" aria-hidden="true"/>}</span>
-      <span className="card-jar-copy"><span className="card-jar-title">{opened ? 'Today’s card' : 'Pick today’s card'}</span><span className="card-jar-caption">{opened ? 'A new one tomorrow' : 'A note for your journey'}</span></span>
+  const showCard = phase === 'open' || phase === 'closing';
+  return <div ref={root} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}`}>
+    {card && showCard && <section className="card-pop" role="dialog" aria-label={`Your card for ${card.label}`}>
+      <button ref={closeButton} type="button" className="card-pop-close" onClick={() => close()} aria-label="Put the card back">×</button>
+      <p className="card-pop-date">Your card for {card.label}</p>
+      <p className="card-pop-message">{card.message}</p>
+      <p className="card-pop-signature">— Raygan</p>
+      <div className="card-pop-actions">
+        <button type="button" onClick={share} disabled={!!busy}>{busy === 'share' ? 'Preparing…' : 'Share'}</button>
+        <button type="button" onClick={save} disabled={!!busy}>{busy === 'download' ? 'Saving…' : 'Download'}</button>
+      </div>
+      <p className="card-pop-note" role="status">{notice || 'A new card waits for you tomorrow.'}</p>
+    </section>}
+    <button ref={jar} type="button" className="card-jar" onClick={() => phase === 'open' ? close() : open()} aria-expanded={showCard} aria-label={opened ? 'Read today’s card again' : 'Open the jar for today’s card'}>
+      <Jar/>
+      <span className="card-jar-hint" aria-hidden="true">{opened ? 'today’s card' : 'tap to open'}</span>
     </button>
-    <dialog ref={dialog} className="card-dialog" aria-labelledby="card-dialog-message" onClose={() => setPhase('idle')} onClick={e => { if (e.target === e.currentTarget) dialog.current?.close(); }} data-lenis-prevent>
-      {card && <div className="card-dialog-inner">
-        <article className="card-paper">
-          <p className="eyebrow">Your card for {card.label}</p>
-          <p id="card-dialog-message" className="card-message">{card.message}</p>
-          <p className="card-signature">— Raygan</p>
-        </article>
-        <div className="card-dialog-actions">
-          <button type="button" className="button primary" onClick={share} disabled={!!busy}>{busy === 'share' ? 'PREPARING…' : 'SHARE'}</button>
-          <button type="button" className="button" onClick={save} disabled={!!busy}>{busy === 'download' ? 'SAVING…' : 'DOWNLOAD IMAGE'}</button>
-          <button type="button" className="text-button" onClick={() => dialog.current?.close()}>CLOSE</button>
-        </div>
-        <p className="card-dialog-note" role="status">{notice || 'A new card is waiting for you tomorrow.'}</p>
-      </div>}
-    </dialog>
-  </>;
+  </div>;
 }
