@@ -18,6 +18,34 @@ type Phase = 'idle' | 'opening' | 'open' | 'closing';
 
 const read = () => { try { return localStorage.getItem(storageKey); } catch { return null; } };
 const write = (value: string) => { try { localStorage.setItem(storageKey, value); } catch {} };
+function untilTomorrow() {
+  const now = new Date(), midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const minutes = Math.max(1, Math.ceil((midnight.getTime() - now.getTime()) / 6e4)), h = Math.floor(minutes / 60), m = minutes % 60;
+  return h ? `${h}h ${m}m` : `${m}m`;
+}
+// A soft pop, a paper rustle and a little two-note chime, synthesised so there is no audio file to load.
+function playOpenSound() {
+  try {
+    const ctx = new AudioContext(), t = ctx.currentTime, out = ctx.createGain();
+    out.gain.value = .5; out.connect(ctx.destination);
+    const pop = ctx.createOscillator(), popGain = ctx.createGain();
+    pop.frequency.setValueAtTime(520, t); pop.frequency.exponentialRampToValueAtTime(140, t + .12);
+    popGain.gain.setValueAtTime(.5, t); popGain.gain.exponentialRampToValueAtTime(.001, t + .14);
+    pop.connect(popGain).connect(out); pop.start(t); pop.stop(t + .15);
+    const noise = ctx.createBuffer(1, ctx.sampleRate * .3, ctx.sampleRate), data = noise.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) * (Math.random() < .3 ? 1 : .3);
+    const rustle = ctx.createBufferSource(), band = ctx.createBiquadFilter(), rustleGain = ctx.createGain();
+    rustle.buffer = noise; band.type = 'bandpass'; band.frequency.value = 3200; band.Q.value = .8; rustleGain.gain.value = .18;
+    rustle.connect(band).connect(rustleGain).connect(out); rustle.start(t + .08);
+    [[1046.5, .32], [1568, .44]].forEach(([freq, at]) => {
+      const bell = ctx.createOscillator(), bellGain = ctx.createGain();
+      bell.type = 'sine'; bell.frequency.value = freq;
+      bellGain.gain.setValueAtTime(0, t + at); bellGain.gain.linearRampToValueAtTime(.16, t + at + .01); bellGain.gain.exponentialRampToValueAtTime(.001, t + at + .7);
+      bell.connect(bellGain).connect(out); bell.start(t + at); bell.stop(t + at + .75);
+    });
+    setTimeout(() => ctx.close(), 1500);
+  } catch {}
+}
 const motion = (ms: number) => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms;
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
@@ -79,12 +107,22 @@ function Jar() {
     <g className="card-jar-body">
       <path d="M33 34 C31.5 42 21 46 19.5 58 L18.6 116 C18.4 125 24 130 33 130.3 L87.5 130.6 C96.5 130.4 101.6 125 101.4 116.2 L100.6 58.6 C99.4 46.4 89 42.4 87.4 33.6" fill="#fbfaff" strokeWidth="2.4" {...ink}/>
       <path d="M34.6 36.5 C34 41.8 24.4 46.6 23 57.4 M86.2 36.2 C87 41.6 96.4 46 97.6 57" fill="none" strokeWidth="1.2" opacity=".35" {...ink}/>
+      <path d="M22 116 L42 112 L44 125 L24 127.6 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
+      <path d="M62 117 L84 113.6 L86.6 126.4 L64 128 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
+      <path d="M80 104 L97 101 L98 117 L82 118.4 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
+      <path d="M41 118 L60 120.6 L58.6 129 L40 127 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
       <path d="M27 100 L48 94.5 L51.4 110.5 L30 115.6 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
       <path d="M30.4 104.6 L49 99.6" fill="none" strokeWidth="1" opacity=".5" {...ink}/>
       <path d="M53 103.5 L78 101 L79.6 119 L54.6 120.6 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
       <path d="M66 84 L89 88.5 L86 104 L63.4 100 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
       <path d="M32 82 L54 78.6 L56.4 93 L34 96 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
+      <path d="M22.6 66 L40 62 L42.6 77 L24 79.6 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
+      <path d="M72 66.6 L94 70.4 L92 84 L70.6 80 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
       <path d="M46 66 L66 62.4 L68.6 77 L48 80 Z" fill="#fffdf7" strokeWidth="1.8" {...ink}/>
+      <path d="M38 50 L58 46 L62 58.6 L41 62.4 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
+      <path d="M60 52 L80 50 L81 63 L61 64 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
+      <path d="M54 30 L68 24 L73 38 L58.6 43 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
+      <path d="M42 36 L54 40.4 L50.6 50 L39 46 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
       <path d="M49 71.4 L66.6 68.4" fill="none" stroke="#ad93ff" strokeWidth="1.4"/>
       <path d="M28.6 92 C26 78 27.4 64 33.6 55.6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
       <path d="M28.2 100 L28 104" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
@@ -103,13 +141,24 @@ export function DailyCardJar() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [busy, setBusy] = useState<'share' | 'download' | null>(null);
   const [notice, setNotice] = useState('');
+  const [wait, setWait] = useState('');
+  const [tucked, setTucked] = useState(false);
   const root = useRef<HTMLDivElement>(null), jar = useRef<HTMLButtonElement>(null), closeButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => { const t = today(); setCard(t); setOpened(read() === t.key); }, []);
 
+  // Step out of the way while the footer (social links, contact details) is on screen.
+  useEffect(() => {
+    const footer = document.querySelector('footer');
+    if (!footer) return;
+    const observer = new IntersectionObserver(([entry]) => setTucked(entry.isIntersecting));
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
+
   function open() {
     if (!card || phase !== 'idle') return;
-    setPhase('opening'); setNotice(''); write(card.key);
+    setPhase('opening'); setNotice(''); setWait(untilTomorrow()); write(card.key); playOpenSound();
     setTimeout(() => { setPhase('open'); setOpened(true); closeButton.current?.focus({preventScroll: true}); }, motion(550));
   }
   function close(returnFocus = true) {
@@ -145,7 +194,7 @@ export function DailyCardJar() {
   }
 
   const showCard = phase === 'open' || phase === 'closing';
-  return <div ref={root} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}`}>
+  return <div ref={root} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}${tucked && phase === 'idle' ? ' tucked' : ''}`}>
     {card && showCard && <section className="card-pop" role="dialog" aria-label={`Your card for ${card.label}`}>
       <button ref={closeButton} type="button" className="card-pop-close" onClick={() => close()} aria-label="Put the card back">×</button>
       <p className="card-pop-date">Your card for {card.label}</p>
@@ -155,11 +204,10 @@ export function DailyCardJar() {
         <button type="button" onClick={share} disabled={!!busy}>{busy === 'share' ? 'Preparing…' : 'Share'}</button>
         <button type="button" onClick={save} disabled={!!busy}>{busy === 'download' ? 'Saving…' : 'Download'}</button>
       </div>
-      <p className="card-pop-note" role="status">{notice || 'A new card waits for you tomorrow.'}</p>
+      <p className="card-pop-note" role="status">{notice || <>A new card lands tomorrow <span className="card-pop-wait">· in {wait}</span></>}</p>
     </section>}
     <button ref={jar} type="button" className="card-jar" onClick={() => phase === 'open' ? close() : open()} aria-expanded={showCard} aria-label={opened ? 'Read today’s card again' : 'Open the jar for today’s card'}>
       <Jar/>
-      <span className="card-jar-hint" aria-hidden="true">{opened ? 'today’s card' : 'tap to open'}</span>
     </button>
   </div>;
 }
