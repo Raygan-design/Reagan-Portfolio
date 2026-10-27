@@ -15,13 +15,32 @@ const tones = [
 ];
 type Tone = typeof tones[number];
 
-// Everyone gets the same card on the same local day; it changes at midnight.
+// Each visitor has their own shuffled order of the cards, so two people rarely see the same
+// card on the same day. A visitor keeps one card all day (it changes at midnight) and goes
+// through every card before any repeats.
+const seedKey = 'raygan-card-seed';
+function visitorSeed() {
+  try {
+    const saved = Number(localStorage.getItem(seedKey));
+    if (saved) return saved;
+    const seed = crypto.getRandomValues(new Uint32Array(1))[0] || 1;
+    localStorage.setItem(seedKey, String(seed));
+    return seed;
+  } catch { return Math.floor(Math.random() * 2 ** 32) || 1; }
+}
+function shuffled(count: number, seed: number) {
+  let a = seed >>> 0;
+  const random = () => { a = (a + 0x6d2b79f5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t ^= t + Math.imul(t ^ (t >>> 7), 61 | t); return ((t ^ (t >>> 14)) >>> 0) / 2 ** 32; };
+  const order = [...Array(count).keys()];
+  for (let i = count - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  return order;
+}
 function today() {
-  const now = new Date();
+  const now = new Date(), seed = visitorSeed();
   const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
   const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const label = now.toLocaleDateString('en-GB', {weekday: 'long', day: 'numeric', month: 'long'});
-  return {key, label, message: cards[day % cards.length], tone: tones[day % tones.length]};
+  return {key, label, message: cards[shuffled(cards.length, seed)[day % cards.length]], tone: tones[(day + seed) % tones.length]};
 }
 type Today = ReturnType<typeof today>;
 type Phase = 'idle' | 'opening' | 'open' | 'closing';
@@ -229,7 +248,7 @@ export function DailyCardJar() {
   async function share() {
     if (!card) return; setBusy('share'); setNotice('');
     try {
-      const blob = await renderCard(card), file = new File([blob], `raygan-card-${card.key}.png`, {type: 'image/png'});
+      const blob = await cardImage(), file = new File([blob], `raygan-card-${card.key}.png`, {type: 'image/png'});
       const text = `${card.message} — Raygan`;
       if (navigator.canShare?.({files: [file]})) await navigator.share({files: [file], title: 'My card from Raygan', text});
       else if (navigator.share) await navigator.share({title: 'My card from Raygan', text, url: location.origin});
@@ -238,12 +257,24 @@ export function DailyCardJar() {
     setBusy(null);
   }
 
+  // On phones, saving goes through the share sheet, which offers "Save Image" (iPhone) or
+  // saving to the gallery (Android). Websites can't write to the photo library directly.
   async function save() {
     if (!card) return; setBusy('download'); setNotice('');
-    try { download(await renderCard(card), `raygan-card-${card.key}.png`); setNotice('Saved to your downloads.'); }
-    catch { setNotice('Couldn’t save the image.'); }
+    try {
+      const blob = await cardImage(), file = new File([blob], `raygan-card-${card.key}.png`, {type: 'image/png'});
+      if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({files: [file]})) {
+        await navigator.share({files: [file]});
+      } else { download(blob, file.name); setNotice('Saved to your downloads.'); }
+    } catch (e) { if ((e as Error).name !== 'AbortError') setNotice('Couldn’t save the image.'); }
     setBusy(null);
   }
+
+  // Phones only let a page open the share sheet straight from a tap, so the image is
+  // prepared as soon as the card opens rather than after the button is pressed.
+  const image = useRef<Promise<Blob> | null>(null);
+  useEffect(() => { if (phase === 'open' && card && !image.current) image.current = renderCard(card).catch(() => { image.current = null; throw new Error('render'); }); }, [phase, card]);
+  const cardImage = () => (image.current ??= card ? renderCard(card) : Promise.reject(new Error('no card')));
 
   const showCard = phase === 'open' || phase === 'closing';
   return <>
