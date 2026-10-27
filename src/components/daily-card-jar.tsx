@@ -5,13 +5,13 @@ import cards from '@/content/daily-cards.json';
 
 const storageKey = 'raygan-daily-card';
 
-// Each day's card is one of the jar's note colours. The same colour is used for the note
+// Each day's card is one of the jar's note colours, and shares their straight-edged shape. The same colour is used for the note
 // that leaves the jar, the card it grows into, and the downloaded image.
+// Light, sticky-note shades so the dark handwriting stands out.
 const tones = [
-  {paper: '#ffe7a8', shadow: '#ad93ff', soft: '#6852ae'},
-  {paper: '#ad93ff', shadow: '#000047', soft: '#2a1d6e'},
-  {paper: '#ffd3c4', shadow: '#ad93ff', soft: '#6852ae'},
-  {paper: '#f2efff', shadow: '#ad93ff', soft: '#6852ae'},
+  {paper: '#fff1b8', shadow: '#ad93ff', soft: '#5b4a9e'},
+  {paper: '#ffdcc2', shadow: '#ad93ff', soft: '#5b4a9e'},
+  {paper: '#e6ddff', shadow: '#ad93ff', soft: '#4b3c8c'},
 ];
 type Tone = typeof tones[number];
 
@@ -95,7 +95,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
 }
 
 // Draws what the visitor sees, at 1080×1350 (the size Instagram and WhatsApp handle best):
-// the sketch card with its purple offset shadow, sitting above the jar.
+// the sticky-note card with its purple offset shadow, sitting above the jar.
 async function renderCard({message, label, tone}: Today) {
   await Promise.all([document.fonts.load("72px 'Oooh Baby'"), document.fonts.load("700 28px 'Bricolage Grotesque Variable'"), document.fonts.load("400 28px 'Bricolage Grotesque Variable'")]);
   const W = 1080, H = 1350, s = 2.6875, cardW = 320 * s, pad = 24 * s, canvas = document.createElement('canvas');
@@ -116,14 +116,12 @@ async function renderCard({message, label, tone}: Today) {
   ctx.translate(0, -Math.max(0, (cardBottom - cardH - (H - jarBottom)) / 2)); // centre the card and jar vertically
 
   ctx.save(); ctx.translate(cardX, cardBottom); ctx.rotate(-1.5 * Math.PI / 180);
-  const outer = [{x: 255 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 255 * s}];
-  const inner = [{x: 15 * s, y: 255 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 255 * s, y: 15 * s}];
+  const outer = 3 * s;
   ctx.shadowColor = '#21153b22'; ctx.shadowBlur = 40 * s; ctx.shadowOffsetY = 18 * s;
   ctx.fillStyle = tone.shadow; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 6 * s, cardW, cardH, outer); ctx.fill();
   ctx.shadowColor = 'transparent';
   ctx.fillStyle = tone.paper; ctx.beginPath(); ctx.roundRect(0, -cardH, cardW, cardH, outer); ctx.fill();
   ctx.strokeStyle = '#000047'; ctx.lineWidth = 2 * s; ctx.stroke();
-  ctx.globalAlpha = .3; ctx.lineWidth = s; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 4 * s, cardW - 8 * s, cardH - 8 * s, inner); ctx.stroke(); ctx.globalAlpha = 1;
 
   let y = -cardH + 26 * s; ctx.fillStyle = '#000047'; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
   date(); dateLines.forEach(line => { ctx.fillText(line, pad, y + 2 * s); y += 16 * s; });
@@ -159,22 +157,22 @@ function Jar({paper}: {paper: string}) {
     <g className="card-jar-body">
       <path d="M33 34 C31.5 42 21 46 19.5 58 L18.6 116 C18.4 125 24 130 33 130.3 L87.5 130.6 C96.5 130.4 101.6 125 101.4 116.2 L100.6 58.6 C99.4 46.4 89 42.4 87.4 33.6" fill="#fbfaff" strokeWidth="2.4" {...ink}/>
       <path d="M34.6 36.5 C34 41.8 24.4 46.6 23 57.4 M86.2 36.2 C87 41.6 96.4 46 97.6 57" fill="none" strokeWidth="1.2" opacity=".35" {...ink}/>
-      <path d="M22 116 L42 112 L44 125 L24 127.6 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
-      <path d="M62 117 L84 113.6 L86.6 126.4 L64 128 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
-      <path d="M80 104 L97 101 L98 117 L82 118.4 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
+      <path d="M22 116 L42 112 L44 125 L24 127.6 Z" fill="#fff1b8" strokeWidth="1.8" {...ink}/>
+      <path d="M62 117 L84 113.6 L86.6 126.4 L64 128 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
+      <path d="M80 104 L97 101 L98 117 L82 118.4 Z" fill="#ffdcc2" strokeWidth="1.8" {...ink}/>
       <path d="M41 118 L60 120.6 L58.6 129 L40 127 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
-      <path d="M27 100 L48 94.5 L51.4 110.5 L30 115.6 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
+      <path d="M27 100 L48 94.5 L51.4 110.5 L30 115.6 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
       <path d="M30.4 104.6 L49 99.6" fill="none" strokeWidth="1" opacity=".5" {...ink}/>
-      <path d="M53 103.5 L78 101 L79.6 119 L54.6 120.6 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
+      <path d="M53 103.5 L78 101 L79.6 119 L54.6 120.6 Z" fill="#fff1b8" strokeWidth="1.8" {...ink}/>
       <path d="M66 84 L89 88.5 L86 104 L63.4 100 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
-      <path d="M32 82 L54 78.6 L56.4 93 L34 96 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
-      <path d="M22.6 66 L40 62 L42.6 77 L24 79.6 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
-      <path d="M72 66.6 L94 70.4 L92 84 L70.6 80 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
+      <path d="M32 82 L54 78.6 L56.4 93 L34 96 Z" fill="#ffdcc2" strokeWidth="1.8" {...ink}/>
+      <path d="M22.6 66 L40 62 L42.6 77 L24 79.6 Z" fill="#fff1b8" strokeWidth="1.8" {...ink}/>
+      <path d="M72 66.6 L94 70.4 L92 84 L70.6 80 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
       <path d="M46 66 L66 62.4 L68.6 77 L48 80 Z" fill="#fffdf7" strokeWidth="1.8" {...ink}/>
-      <path d="M38 50 L58 46 L62 58.6 L41 62.4 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
+      <path d="M38 50 L58 46 L62 58.6 L41 62.4 Z" fill="#ffdcc2" strokeWidth="1.8" {...ink}/>
       <path d="M60 52 L80 50 L81 63 L61 64 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
       <path className="card-jar-picked" d="M54 30 L68 24 L73 38 L58.6 43 Z" fill={paper} strokeWidth="1.8" {...ink}/>
-      <path d="M42 36 L54 40.4 L50.6 50 L39 46 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
+      <path d="M42 36 L54 40.4 L50.6 50 L39 46 Z" fill="#e6ddff" strokeWidth="1.8" {...ink}/>
       <path d="M49 71.4 L66.6 68.4" fill="none" stroke="#ad93ff" strokeWidth="1.4"/>
       <path d="M28.6 92 C26 78 27.4 64 33.6 55.6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
       <path d="M28.2 100 L28 104" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
@@ -262,7 +260,7 @@ export function DailyCardJar() {
       <p className="card-pop-note" role="status">{notice || <>A new card lands tomorrow <span className="card-pop-wait">· in {wait}</span></>}</p>
     </section>}
     <button ref={jar} type="button" className="card-jar" onClick={() => phase === 'open' ? close() : open()} aria-expanded={showCard} aria-label={opened ? 'Read today’s card again' : 'Open the jar for today’s card'}>
-      <Jar paper={card?.tone.paper ?? '#ffe7a8'}/>
+      <Jar paper={card?.tone.paper ?? '#fff1b8'}/>
     </button>
   </div>
   </>;
