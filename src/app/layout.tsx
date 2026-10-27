@@ -9,7 +9,7 @@ import { site } from '@/lib/site';
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url), title: { default:'Raygan — Created to Create.', template:'%s — Raygan' },
-  description:'Reagan Marfo, creative entrepreneur building products, media, stories and communities.',
+  description:'Reagan Marfo, a creative entrepreneur building products, media, stories and communities.',
   openGraph:{title:'Raygan — Created to Create.',description:'Products, media, stories and communities.',type:'website'},
 };
 export default function RootLayout({children}:{children:React.ReactNode}) {
