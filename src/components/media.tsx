@@ -4,11 +4,14 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { safeExternalUrl } from '@/lib/site';
 
-export function Film({src,poster,title='MY STORY · FILM',className=''}:{src?:string;poster?:string;title?:string;className?:string}){
+export function Film({src,youtube,poster,title='MY STORY · FILM',className=''}:{src?:string;youtube?:string;poster?:string;title?:string;className?:string}){
   const dialog=useRef<HTMLDialogElement>(null);const video=useRef<HTMLVideoElement>(null);
+  // A YouTube film only loads while the dialog is open, so closing it stops playback.
+  const [open,setOpen]=useState(false);
   const media=src?.startsWith('/')&&!src.startsWith('//')?src:safeExternalUrl(src);
   function close(){video.current?.pause();dialog.current?.close()}
-  return <><div className={`film ${className}`}>{poster&&<Image src={poster} alt="Reagan Marfo" fill sizes="(max-width: 700px) 90vw, 92vw" className="film-poster" priority/>}<span className="film-label eyebrow">{title}</span><button className="play-button" onClick={()=>dialog.current?.showModal()} aria-label={`Play ${title}`}>PLAY <span aria-hidden="true">▶</span></button><span className="film-caption eyebrow">{poster?'CREATED TO CREATE':'UNSCRIPTED WITH RAYGAN'}</span></div><dialog ref={dialog} className="video-dialog" onClose={()=>video.current?.pause()} aria-label={title}><button className="icon-button" onClick={close} autoFocus aria-label="Close video">×</button>{media?<video ref={video} src={media} controls playsInline preload="none"/>:<p role="status">This film isn’t available here yet. Please check back soon.</p>}</dialog></>;
+  function play(){setOpen(true);dialog.current?.showModal()}
+  return <><div className={`film ${className}`}>{poster&&<Image src={poster} alt="Reagan Marfo" fill sizes="(max-width: 700px) 90vw, 92vw" className="film-poster" priority/>}<span className="film-label eyebrow">{title}</span><button className="play-button" onClick={play} aria-label={`Play ${title}`}>PLAY <span aria-hidden="true">▶</span></button><span className="film-caption eyebrow">{poster?'CREATED TO CREATE':'UNSCRIPTED WITH RAYGAN'}</span></div><dialog ref={dialog} className="video-dialog" onClose={()=>{video.current?.pause();setOpen(false)}} aria-label={title}><button className="icon-button" onClick={close} autoFocus aria-label="Close video">×</button>{youtube?(open&&<iframe className="video-embed" src={`https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1&rel=0&playsinline=1`} title={title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen/>):media?<video ref={video} src={media} controls playsInline preload="none"/>:<p role="status">This film isn’t available here yet. Please check back soon.</p>}</dialog></>;
 }
 export function Gallery({images,labels,compact=false}:{images:string[];labels?:string[];compact?:boolean}){
   const track=useRef<HTMLDivElement>(null);const [active,setActive]=useState(0);
