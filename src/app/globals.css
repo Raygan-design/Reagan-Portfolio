@@ -184,3 +184,6 @@
 .support-fab{transition:transform .45s cubic-bezier(.5,0,.3,1),opacity .3s,background .2s,border-color .2s}.support-fab.tucked{transform:translateY(130%);opacity:0;pointer-events:none}
 .card-overlay{position:fixed;inset:0;z-index:21;background:#00002e;opacity:0;pointer-events:none;transition:opacity .4s}.card-overlay.opening,.card-overlay.open{opacity:.28}
 @media(max-width:760px){.support-fab{padding:6px}.support-fab-copy{display:none}}
+/* The floating jar and Keep moving button arrive with the page's own entrance (same blur, rise and timing). */
+@media(prefers-reduced-motion:no-preference){.card-jar-wrap,.support-fab{animation:float-entrance var(--enter-time,.85s) cubic-bezier(.25,.1,.25,1)}body:has(.home-entrance){--enter-blur:6px;--enter-y:20px;--enter-time:1.2s}}
+@keyframes float-entrance{from{filter:blur(var(--enter-blur,3px));transform:translateY(var(--enter-y,10px))}to{filter:none;transform:none}}
