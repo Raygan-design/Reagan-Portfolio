@@ -23,37 +23,56 @@ function untilTomorrow() {
   const minutes = Math.max(1, Math.ceil((midnight.getTime() - now.getTime()) / 6e4)), h = Math.floor(minutes / 60), m = minutes % 60;
   return h ? `${h}h ${m}m` : `${m}m`;
 }
-// Synthesised to follow the animation beat by beat (no audio file to load):
-// lid pops on tap, glass rattles with each swing of the shake, paper whooshes as the
-// card rises out of the jar, then a little chime as it settles.
-const shakeMs = 550, riseMs = 600;
-function playOpenSound(animated: boolean) {
+// Synthesised to follow the animation beat by beat (no audio file to load).
+// Opening: lid pops, glass rattles with each swing, the note flicks out of the jar,
+// paper whooshes as it grows into the card, then a chime as it lands.
+// Closing: the reverse whoosh as the card folds up, then a soft plop into the jar.
+const shakeMs = 550, riseMs = 950, returnMs = 750;
+function sound(play: (ctx: AudioContext, t: number, tone: Tone, whoosh: Whoosh) => number) {
   try {
     const ctx = new AudioContext(), t = ctx.currentTime + .02, out = ctx.createGain();
     out.gain.value = .55; out.connect(ctx.destination);
-    const tone = (type: OscillatorType, from: number, to: number, at: number, length: number, level: number) => {
+    const tone: Tone = (type, from, to, at, length, level) => {
       const osc = ctx.createOscillator(), gain = ctx.createGain();
       osc.type = type; osc.frequency.setValueAtTime(from, at); osc.frequency.exponentialRampToValueAtTime(to, at + length);
       gain.gain.setValueAtTime(0, at); gain.gain.linearRampToValueAtTime(level, at + .005); gain.gain.exponentialRampToValueAtTime(.001, at + length);
       osc.connect(gain).connect(out); osc.start(at); osc.stop(at + length + .02);
     };
-    const settle = animated ? (shakeMs + riseMs * .9) / 1000 : 0;
-    if (animated) {
-      tone('sine', 760, 240, t, .09, .45); // lid pops
-      [.125, .25, .375, .5].forEach((at, i) => tone('triangle', 2600 - i * 180, 2000, t + at * shakeMs / 1000 * 1.0, .05, .12 - i * .02)); // glass rattle on each swing
-      const length = riseMs / 1000, noise = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * length), ctx.sampleRate), data = noise.getChannelData(0);
+    const whoosh: Whoosh = (at, length, from, to, level) => {
+      const noise = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * length), ctx.sampleRate), data = noise.getChannelData(0);
       for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-      const whoosh = ctx.createBufferSource(), band = ctx.createBiquadFilter(), gain = ctx.createGain(), at = t + shakeMs / 1000;
-      whoosh.buffer = noise; band.type = 'bandpass'; band.Q.value = 1.2;
-      band.frequency.setValueAtTime(900, at); band.frequency.exponentialRampToValueAtTime(4200, at + length * .45); band.frequency.exponentialRampToValueAtTime(2200, at + length);
-      gain.gain.setValueAtTime(0, at); gain.gain.linearRampToValueAtTime(.22, at + length * .4); gain.gain.exponentialRampToValueAtTime(.001, at + length);
-      whoosh.connect(band).connect(gain).connect(out); whoosh.start(at); whoosh.stop(at + length);
-    }
-    tone('sine', 1046.5, 1046.5, t + settle, .7, .16); // chime as the card lands
-    tone('sine', 1568, 1568, t + settle + .11, .8, .13);
-    setTimeout(() => ctx.close(), (settle + 1.2) * 1000);
+      const src = ctx.createBufferSource(), band = ctx.createBiquadFilter(), gain = ctx.createGain();
+      src.buffer = noise; band.type = 'bandpass'; band.Q.value = 1.2;
+      band.frequency.setValueAtTime(from, at); band.frequency.exponentialRampToValueAtTime(to, at + length);
+      gain.gain.setValueAtTime(0, at); gain.gain.linearRampToValueAtTime(level, at + length * .45); gain.gain.exponentialRampToValueAtTime(.001, at + length);
+      src.connect(band).connect(gain).connect(out); src.start(at); src.stop(at + length);
+    };
+    const end = play(ctx, t, tone, whoosh);
+    setTimeout(() => ctx.close(), (end + 1.2) * 1000);
   } catch {}
 }
+type Tone = (type: OscillatorType, from: number, to: number, at: number, length: number, level: number) => void;
+type Whoosh = (at: number, length: number, from: number, to: number, level: number) => void;
+const playOpenSound = (animated: boolean) => sound((_, t, tone, whoosh) => {
+  const shake = shakeMs / 1000, rise = riseMs / 1000, land = animated ? shake + rise * .97 : 0;
+  if (animated) {
+    tone('sine', 760, 240, t, .09, .45); // lid pops
+    [.125, .25, .375, .5].forEach((at, i) => tone('triangle', 2600 - i * 180, 2000, t + at * shake, .05, .12 - i * .02)); // glass rattle
+    tone('triangle', 1500, 2900, t + shake, .07, .14); // note flicks out of the jar
+    whoosh(t + shake + rise * .4, rise * .6, 900, 4200, .24); // grows into the card
+  }
+  tone('sine', 1046.5, 1046.5, t + land, .7, .16); // chime as it lands
+  tone('sine', 1568, 1568, t + land + .11, .8, .13);
+  return land + 1;
+});
+const playCloseSound = () => sound((_, t, tone, whoosh) => {
+  const back = returnMs / 1000;
+  whoosh(t, back * .55, 4000, 900, .2); // folds back into a note
+  tone('triangle', 2400, 1400, t + back * .75, .06, .1); // slips past the lid
+  tone('sine', 420, 120, t + back, .14, .4); // plop into the jar
+  tone('triangle', 2300, 2000, t + back + .03, .05, .07);
+  return back + .3;
+});
 const motion = (ms: number) => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms;
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
@@ -65,40 +84,55 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
   return line ? [...lines, line] : lines;
 }
 
-// Wobbly rectangle so the shared image matches the hand-drawn card on screen.
-function sketchRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, seed: number) {
-  const j = (n: number) => Math.sin(seed * 12.9898 + n * 78.233) * 5;
-  ctx.beginPath(); ctx.moveTo(x + j(1), y + j(2));
-  ctx.quadraticCurveTo(x + w / 2, y + j(3) - 4, x + w + j(4), y + j(5));
-  ctx.quadraticCurveTo(x + w + j(6) + 4, y + h / 2, x + w + j(7), y + h + j(8));
-  ctx.quadraticCurveTo(x + w / 2, y + h + j(9) + 4, x + j(10), y + h + j(11));
-  ctx.quadraticCurveTo(x + j(12) - 4, y + h / 2, x + j(1), y + j(2));
-}
-
-// Draws the card as a 1080×1350 portrait image, the size Instagram and WhatsApp handle best.
+// Draws what the visitor sees, at 1080×1350 (the size Instagram and WhatsApp handle best):
+// the sketch card with its purple offset shadow, sitting above the jar.
 async function renderCard({message, label}: Today) {
-  await Promise.all([document.fonts.load("72px 'Oooh Baby'"), document.fonts.load("700 28px 'Bricolage Grotesque Variable'")]);
-  const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1350;
+  await Promise.all([document.fonts.load("72px 'Oooh Baby'"), document.fonts.load("700 28px 'Bricolage Grotesque Variable'"), document.fonts.load("400 28px 'Bricolage Grotesque Variable'")]);
+  const W = 1080, H = 1350, s = 2.6875, cardW = 320 * s, pad = 24 * s, canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#f2efff'; ctx.fillRect(0, 0, 1080, 1350);
-  ctx.save(); ctx.translate(540, 650); ctx.rotate(-0.02);
-  ctx.shadowColor = '#21153b22'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
-  ctx.fillStyle = '#fffdf7'; sketchRect(ctx, -420, -520, 840, 1040, 1); ctx.fill();
-  ctx.shadowColor = 'transparent'; ctx.strokeStyle = '#000047'; ctx.lineWidth = 4; ctx.lineJoin = 'round';
-  sketchRect(ctx, -420, -520, 840, 1040, 1); ctx.stroke();
-  ctx.lineWidth = 2; ctx.globalAlpha = .45; sketchRect(ctx, -412, -512, 828, 1026, 2); ctx.stroke(); ctx.globalAlpha = 1;
-  ctx.fillStyle = '#000047'; ctx.textAlign = 'center';
-  ctx.font = "700 26px 'Bricolage Grotesque Variable'"; ctx.letterSpacing = '4px';
-  ctx.fillText(`YOUR CARD FOR ${label.toUpperCase()}`, 0, -420);
-  ctx.letterSpacing = '0px';
-  let size = 88; ctx.font = `${size}px 'Oooh Baby'`; let lines = wrap(ctx, message, 680);
-  while (lines.length > 6 && size > 52) { size -= 6; ctx.font = `${size}px 'Oooh Baby'`; lines = wrap(ctx, message, 680); }
-  const lineHeight = size * 1.25, top = -lineHeight * (lines.length - 1) / 2 - 10;
-  lines.forEach((text, i) => ctx.fillText(text, 0, top + i * lineHeight));
-  ctx.font = "64px 'Oooh Baby'"; ctx.fillStyle = '#6852ae'; ctx.fillText('— Raygan', 140, 410);
+  ctx.fillStyle = '#f2efff'; ctx.fillRect(0, 0, W, H);
+
+  const jarW = 84 * s, jarH = 98 * s, jarX = 100, jarBottom = H - 50, cardX = jarX + 4 * s, cardBottom = jarBottom - 122 * s;
+  const date = () => { ctx.font = `700 ${11 * s}px 'Bricolage Grotesque Variable'`; ctx.letterSpacing = `${1.32 * s}px`; };
+  date(); const dateLines = wrap(ctx, `YOUR CARD FOR ${label.toUpperCase()}`, cardW - pad * 2 - 30 * s);
+  let size = 31 * s, lines: string[] = [], cardH = 0;
+  do {
+    ctx.letterSpacing = '0px'; ctx.font = `${size}px 'Oooh Baby'`; lines = wrap(ctx, message, cardW - pad * 2);
+    cardH = 26 * s + dateLines.length * 16 * s + 14 * s + lines.length * size * 1.25 + 8 * s + 39 * s + 14 * s + 18 * s + 24 * s;
+    size -= 2 * s;
+  } while (cardBottom - cardH < 50 && size > 18 * s);
+  size += 2 * s;
+  ctx.translate(0, -Math.max(0, (cardBottom - cardH - (H - jarBottom)) / 2)); // centre the card and jar vertically
+
+  ctx.save(); ctx.translate(cardX, cardBottom); ctx.rotate(-1.5 * Math.PI / 180);
+  const outer = [{x: 255 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 255 * s}];
+  const inner = [{x: 15 * s, y: 255 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 255 * s, y: 15 * s}];
+  ctx.shadowColor = '#21153b22'; ctx.shadowBlur = 40 * s; ctx.shadowOffsetY = 18 * s;
+  ctx.fillStyle = '#ad93ff'; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 6 * s, cardW, cardH, outer); ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#fffdf7'; ctx.beginPath(); ctx.roundRect(0, -cardH, cardW, cardH, outer); ctx.fill();
+  ctx.strokeStyle = '#000047'; ctx.lineWidth = 2 * s; ctx.stroke();
+  ctx.globalAlpha = .3; ctx.lineWidth = s; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 4 * s, cardW - 8 * s, cardH - 8 * s, inner); ctx.stroke(); ctx.globalAlpha = 1;
+
+  let y = -cardH + 26 * s; ctx.fillStyle = '#000047'; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+  date(); dateLines.forEach(line => { ctx.fillText(line, pad, y + 2 * s); y += 16 * s; });
+  y += 14 * s; ctx.letterSpacing = '0px'; ctx.font = `${size}px 'Oooh Baby'`;
+  lines.forEach(line => { ctx.fillText(line, pad, y + size * .1); y += size * 1.25; });
+  y += 8 * s; ctx.font = `${26 * s}px 'Oooh Baby'`; ctx.fillStyle = '#6852ae'; ctx.textAlign = 'right'; ctx.fillText('— Raygan', cardW - pad - 4 * s, y + 4 * s);
+  y += 39 * s + 14 * s; ctx.font = `400 ${12 * s}px 'Bricolage Grotesque Variable'`; ctx.fillStyle = '#756a84'; ctx.textAlign = 'center';
+  ctx.fillText('Pick your card at reaganmarfo.com', cardW / 2, y);
   ctx.restore();
-  ctx.fillStyle = '#000047'; ctx.textAlign = 'center'; ctx.font = "700 24px 'Bricolage Grotesque Variable'"; ctx.letterSpacing = '3px';
-  ctx.fillText('RAYGAN.  ·  PICK YOUR CARD AT REAGANMARFO.COM', 540, 1290);
+
+  const art = document.querySelector('.card-jar-art')?.cloneNode(true) as SVGElement | undefined;
+  if (art) {
+    art.setAttribute('width', String(jarW)); art.setAttribute('height', String(jarH)); art.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    const img = new Image(); img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(art))}`;
+    try { await img.decode(); ctx.drawImage(img, jarX, jarBottom - jarH, jarW, jarH); } catch {}
+  }
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#000047';
+  ctx.font = `700 ${34}px 'Bricolage Grotesque Variable'`; ctx.letterSpacing = '0px'; ctx.fillText('RAYGAN.', jarX + jarW + 40, jarBottom - jarH / 2 + 4);
+  ctx.font = `400 ${26}px 'Bricolage Grotesque Variable'`; ctx.fillStyle = '#756a84'; ctx.fillText('A new card every day', jarX + jarW + 40, jarBottom - jarH / 2 + 44);
   return new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Could not create image')), 'image/png'));
 }
 
@@ -129,7 +163,7 @@ function Jar() {
       <path d="M46 66 L66 62.4 L68.6 77 L48 80 Z" fill="#fffdf7" strokeWidth="1.8" {...ink}/>
       <path d="M38 50 L58 46 L62 58.6 L41 62.4 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
       <path d="M60 52 L80 50 L81 63 L61 64 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
-      <path d="M54 30 L68 24 L73 38 L58.6 43 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
+      <path className="card-jar-picked" d="M54 30 L68 24 L73 38 L58.6 43 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
       <path d="M42 36 L54 40.4 L50.6 50 L39 46 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
       <path d="M49 71.4 L66.6 68.4" fill="none" stroke="#ad93ff" strokeWidth="1.4"/>
       <path d="M28.6 92 C26 78 27.4 64 33.6 55.6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
@@ -170,8 +204,9 @@ export function DailyCardJar() {
     setTimeout(() => { setPhase('open'); setOpened(true); closeButton.current?.focus({preventScroll: true}); }, motion(shakeMs));
   }
   function close(returnFocus = true) {
-    setPhase(p => p === 'open' ? 'closing' : p);
-    setTimeout(() => { setPhase('idle'); if (returnFocus) jar.current?.focus({preventScroll: true}); }, motion(380));
+    if (phase !== 'open') return;
+    setPhase('closing'); if (motion(1)) playCloseSound();
+    setTimeout(() => { setPhase('idle'); if (returnFocus) jar.current?.focus({preventScroll: true}); }, motion(returnMs));
   }
 
   useEffect(() => {
@@ -202,7 +237,9 @@ export function DailyCardJar() {
   }
 
   const showCard = phase === 'open' || phase === 'closing';
-  return <div ref={root} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}${tucked && phase === 'idle' ? ' tucked' : ''}`}>
+  return <>
+    <div className={`card-overlay ${phase}`} aria-hidden="true"/>
+    <div ref={root} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}${tucked && phase === 'idle' ? ' tucked' : ''}`}>
     {card && showCard && <section className="card-pop" role="dialog" aria-label={`Your card for ${card.label}`}>
       <button ref={closeButton} type="button" className="card-pop-close" onClick={() => close()} aria-label="Put the card back">×</button>
       <p className="card-pop-date">Your card for {card.label}</p>
@@ -217,5 +254,6 @@ export function DailyCardJar() {
     <button ref={jar} type="button" className="card-jar" onClick={() => phase === 'open' ? close() : open()} aria-expanded={showCard} aria-label={opened ? 'Read today’s card again' : 'Open the jar for today’s card'}>
       <Jar/>
     </button>
-  </div>;
+  </div>
+  </>;
 }

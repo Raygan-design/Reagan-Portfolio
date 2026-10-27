@@ -16,7 +16,9 @@ export function SupportFab() {
     observer.observe(footer);
     return () => observer.disconnect();
   }, [pathname]);
-  return <Link href={onSupportPage ? '#support-fuel' : '/support'} className={`support-fab${tucked ? ' tucked' : ''}`} tabIndex={tucked ? -1 : undefined} aria-label="Keep moving — support Reagan’s journey">
+  // The support page is where this button leads, so it isn't needed there.
+  if (onSupportPage) return null;
+  return <Link href="/support" className={`support-fab${tucked ? ' tucked' : ''}`} tabIndex={tucked ? -1 : undefined} aria-label="Keep moving — support Reagan’s journey">
     <span className="support-fab-portrait" aria-hidden="true"><span className="support-fab-character"/></span>
     <span className="support-fab-copy"><span className="support-fab-title">Keep moving</span><span className="support-fab-caption">A little fuel for the journey</span></span>
   </Link>;
