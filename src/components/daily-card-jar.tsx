@@ -8,12 +8,17 @@ const storageKey = 'raygan-daily-card';
 // Each day's card is one of the jar's note colours. The same colour is used for the note
 // that leaves the jar, the card it grows into, and the downloaded image.
 // Light, sticky-note shades so the dark handwriting stands out.
-// Each colour has its own matching shadow, ink (main text) and soft ink (signature, small print).
-const yellow = {paper: '#fff1b8', shadow: '#f2c94c', ink: '#46370c', soft: '#7a5a10'};
-const orange = {paper: '#ffdcc2', shadow: '#f4a274', ink: '#5a2412', soft: '#8a3a1a'};
+// Sticky-note colours: the card is the light shade, the shadow is the full colour, and the
+// ink (main text) and soft ink (signature, small print) are dark shades of the same colour.
 const purple = {paper: '#e6ddff', shadow: '#ad93ff', ink: '#2a1d6e', soft: '#4b3c8c'};
-// Purple is the brand colour, so it comes up half the time.
-const tones = [purple, yellow, purple, orange];
+const pink = {paper: '#ffdcec', shadow: '#ff5aa8', ink: '#6b1240', soft: '#a01f5c'};
+const orange = {paper: '#ffe2c8', shadow: '#ff9433', ink: '#5a2a0c', soft: '#8f3f0c'};
+const yellow = {paper: '#fff4b5', shadow: '#ffd21f', ink: '#463a05', soft: '#6e5a08'};
+const green = {paper: '#e3f7c9', shadow: '#86d13b', ink: '#22410b', soft: '#3a6614'};
+const blue = {paper: '#d8eeff', shadow: '#2ea6f0', ink: '#0b3557', soft: '#195a8c'};
+const peach = {paper: '#ffe0d6', shadow: '#ff8a6b', ink: '#5c2014', soft: '#923523'};
+// Purple is the brand colour, so it comes up more often than the others (3 in 9).
+const tones = [purple, pink, orange, purple, yellow, green, purple, blue, peach];
 type Tone = typeof tones[number];
 
 // Each visitor has their own shuffled order of the cards, so two people rarely see the same
@@ -183,10 +188,10 @@ function sketchNote(w: number, h: number) {
   return `M${x + tl[0]} ${y} L${x + w - tr[0]} ${y} A${tr[0]} ${tr[1]} 0 0 1 ${x + w} ${y + tr[1]} L${x + w} ${y + h - br[1]} A${br[0]} ${br[1]} 0 0 1 ${x + w - br[0]} ${y + h} L${x + bl[0]} ${y + h} A${bl[0]} ${bl[1]} 0 0 1 ${x} ${y + h - bl[1]} L${x} ${y + tl[1]} A${tl[0]} ${tl[1]} 0 0 1 ${x + tl[0]} ${y} Z`;
 }
 const jarNotes: [number, number, number, number, number, string][] = [
-  [33, 120, 20, 13, -11, '#fff1b8'], [74, 121, 22, 13, -9, '#e6ddff'], [89, 110, 17, 16, -10, '#ffdcc2'], [50, 124, 19, 9, 8, '#f2efff'],
-  [39, 105, 21, 16, -15, '#e6ddff'], [66, 111, 25, 18, -6, '#fff1b8'], [76, 94, 23, 16, 11, '#f2efff'], [44, 87, 22, 15, -9, '#ffdcc2'],
-  [32, 71, 17.5, 15, -13, '#fff1b8'], [82, 75, 22, 14, 10, '#e6ddff'], [57, 71, 20, 15, -10, '#fffdf7'], [50, 54, 20, 13, -11, '#ffdcc2'],
-  [70, 57, 20, 13, -4, '#f2efff'],
+  [33, 120, 20, 13, -11, '#fff4b5'], [74, 121, 22, 13, -9, '#e6ddff'], [89, 110, 17, 16, -10, '#ffe2c8'], [50, 124, 19, 9, 8, '#d8eeff'],
+  [39, 105, 21, 16, -15, '#ffdcec'], [66, 111, 25, 18, -6, '#e3f7c9'], [76, 94, 23, 16, 11, '#e6ddff'], [44, 87, 22, 15, -9, '#ffe0d6'],
+  [32, 71, 17.5, 15, -13, '#fff4b5'], [82, 75, 22, 14, 10, '#e6ddff'], [57, 71, 20, 15, -10, '#d8eeff'], [50, 54, 20, 13, -11, '#ffdcec'],
+  [70, 57, 20, 13, -4, '#e3f7c9'],
 ];
 
 function Jar({paper}: {paper: string}) {
@@ -198,7 +203,7 @@ function Jar({paper}: {paper: string}) {
       <path d="M34.6 36.5 C34 41.8 24.4 46.6 23 57.4 M86.2 36.2 C87 41.6 96.4 46 97.6 57" fill="none" strokeWidth="1.2" opacity=".35" {...ink}/>
       {jarNotes.map(([x, y, w, h, angle, fill], i) => <path key={i} d={sketchNote(w, h)} transform={`translate(${x} ${y}) rotate(${angle})`} fill={fill} strokeWidth="1.6" {...ink}/>)}
       <path className="card-jar-picked" d={sketchNote(15, 14)} transform="translate(63 34) rotate(-8)" fill={paper} strokeWidth="1.6" {...ink}/>
-      <path d={sketchNote(12.5, 10)} transform="translate(46.5 43) rotate(20)" fill="#e6ddff" strokeWidth="1.6" {...ink}/>
+      <path d={sketchNote(12.5, 10)} transform="translate(46.5 43) rotate(20)" fill="#ffe2c8" strokeWidth="1.6" {...ink}/>
       <path d="M28.6 92 C26 78 27.4 64 33.6 55.6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
       <path d="M28.2 100 L28 104" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
     </g>
