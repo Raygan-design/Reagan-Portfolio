@@ -218,3 +218,12 @@
 @keyframes film-rise{from{opacity:0;transform:translateY(28px) scale(.96)}}
 @media(max-width:600px){.film-modal{padding:16px;--film-w:100%}.film-modal-frame{border-radius:10px}.film-modal-close{padding:9px 13px}}
 @media(prefers-reduced-motion:reduce){.film-modal[open]::backdrop,.film-modal[open] .film-modal-bar,.film-modal[open] .film-modal-link,.film-modal[open] .film-modal-frame{animation:none}}
+/* Brand logos that link to the video made for that brand. */
+.brand-grid .brand-link{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:var(--night);text-decoration:none}
+.brand-grid .brand-link .brand-logo{transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.brand-link:hover .brand-logo,.brand-link:focus-visible .brand-logo{transform:translateY(-8px)}
+@media(prefers-reduced-motion:reduce){.brand-grid .brand-link .brand-logo{transition:none}.brand-link:hover .brand-logo,.brand-link:focus-visible .brand-logo{transform:none}}
+/* Contact: no hero band, so the page opens on the form with "What can I help with?" as its heading. */
+.contact-content .eyebrow{margin:0 0 16px}
+.contact-content h1{font-size:32px;margin-bottom:24px}
+@media(max-width:760px){.contact-content h1{font-size:30px;line-height:34px}}
