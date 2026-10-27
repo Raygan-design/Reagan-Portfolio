@@ -15,7 +15,7 @@ const reels=[
 export default function Speaking(){
  const images=paper['1A7-0'].images;
  const albums:EventAlbum[]=[
-  {name:'The Gospel Academy',images:images.slice(0,7)},
+  {name:'The Gospel Academy',images:[...images.slice(0,7),...Array.from({length:11},(_,i)=>`/images/events/gospel-academy/gospel-academy-${String(i+1).padStart(2,'0')}.webp`)]},
   {name:'FIDCON',images:images.slice(7,12)},
   {name:'Purpose Circles',images:images.slice(12,21)},
  ];
