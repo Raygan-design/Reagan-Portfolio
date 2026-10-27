@@ -5,13 +5,23 @@ import cards from '@/content/daily-cards.json';
 
 const storageKey = 'raygan-daily-card';
 
+// Each day's card is one of the jar's note colours. The same colour is used for the note
+// that leaves the jar, the card it grows into, and the downloaded image.
+const tones = [
+  {paper: '#ffe7a8', shadow: '#ad93ff', soft: '#6852ae'},
+  {paper: '#ad93ff', shadow: '#000047', soft: '#2a1d6e'},
+  {paper: '#ffd3c4', shadow: '#ad93ff', soft: '#6852ae'},
+  {paper: '#f2efff', shadow: '#ad93ff', soft: '#6852ae'},
+];
+type Tone = typeof tones[number];
+
 // Everyone gets the same card on the same local day; it changes at midnight.
 function today() {
   const now = new Date();
   const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
   const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const label = now.toLocaleDateString('en-GB', {weekday: 'long', day: 'numeric', month: 'long'});
-  return {key, label, message: cards[day % cards.length]};
+  return {key, label, message: cards[day % cards.length], tone: tones[day % tones.length]};
 }
 type Today = ReturnType<typeof today>;
 type Phase = 'idle' | 'opening' | 'open' | 'closing';
@@ -28,11 +38,11 @@ function untilTomorrow() {
 // paper whooshes as it grows into the card, then a chime as it lands.
 // Closing: the reverse whoosh as the card folds up, then a soft plop into the jar.
 const shakeMs = 550, riseMs = 950, returnMs = 750;
-function sound(play: (ctx: AudioContext, t: number, tone: Tone, whoosh: Whoosh) => number) {
+function sound(play: (ctx: AudioContext, t: number, tone: Beep, whoosh: Whoosh) => number) {
   try {
     const ctx = new AudioContext(), t = ctx.currentTime + .02, out = ctx.createGain();
     out.gain.value = .55; out.connect(ctx.destination);
-    const tone: Tone = (type, from, to, at, length, level) => {
+    const tone: Beep = (type, from, to, at, length, level) => {
       const osc = ctx.createOscillator(), gain = ctx.createGain();
       osc.type = type; osc.frequency.setValueAtTime(from, at); osc.frequency.exponentialRampToValueAtTime(to, at + length);
       gain.gain.setValueAtTime(0, at); gain.gain.linearRampToValueAtTime(level, at + .005); gain.gain.exponentialRampToValueAtTime(.001, at + length);
@@ -51,7 +61,7 @@ function sound(play: (ctx: AudioContext, t: number, tone: Tone, whoosh: Whoosh) 
     setTimeout(() => ctx.close(), (end + 1.2) * 1000);
   } catch {}
 }
-type Tone = (type: OscillatorType, from: number, to: number, at: number, length: number, level: number) => void;
+type Beep = (type: OscillatorType, from: number, to: number, at: number, length: number, level: number) => void;
 type Whoosh = (at: number, length: number, from: number, to: number, level: number) => void;
 const playOpenSound = (animated: boolean) => sound((_, t, tone, whoosh) => {
   const shake = shakeMs / 1000, rise = riseMs / 1000, land = animated ? shake + rise * .97 : 0;
@@ -86,7 +96,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
 
 // Draws what the visitor sees, at 1080×1350 (the size Instagram and WhatsApp handle best):
 // the sketch card with its purple offset shadow, sitting above the jar.
-async function renderCard({message, label}: Today) {
+async function renderCard({message, label, tone}: Today) {
   await Promise.all([document.fonts.load("72px 'Oooh Baby'"), document.fonts.load("700 28px 'Bricolage Grotesque Variable'"), document.fonts.load("400 28px 'Bricolage Grotesque Variable'")]);
   const W = 1080, H = 1350, s = 2.6875, cardW = 320 * s, pad = 24 * s, canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
@@ -109,9 +119,9 @@ async function renderCard({message, label}: Today) {
   const outer = [{x: 255 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 255 * s}];
   const inner = [{x: 15 * s, y: 255 * s}, {x: 225 * s, y: 15 * s}, {x: 15 * s, y: 225 * s}, {x: 255 * s, y: 15 * s}];
   ctx.shadowColor = '#21153b22'; ctx.shadowBlur = 40 * s; ctx.shadowOffsetY = 18 * s;
-  ctx.fillStyle = '#ad93ff'; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 6 * s, cardW, cardH, outer); ctx.fill();
+  ctx.fillStyle = tone.shadow; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 6 * s, cardW, cardH, outer); ctx.fill();
   ctx.shadowColor = 'transparent';
-  ctx.fillStyle = '#fffdf7'; ctx.beginPath(); ctx.roundRect(0, -cardH, cardW, cardH, outer); ctx.fill();
+  ctx.fillStyle = tone.paper; ctx.beginPath(); ctx.roundRect(0, -cardH, cardW, cardH, outer); ctx.fill();
   ctx.strokeStyle = '#000047'; ctx.lineWidth = 2 * s; ctx.stroke();
   ctx.globalAlpha = .3; ctx.lineWidth = s; ctx.beginPath(); ctx.roundRect(4 * s, -cardH + 4 * s, cardW - 8 * s, cardH - 8 * s, inner); ctx.stroke(); ctx.globalAlpha = 1;
 
@@ -119,8 +129,8 @@ async function renderCard({message, label}: Today) {
   date(); dateLines.forEach(line => { ctx.fillText(line, pad, y + 2 * s); y += 16 * s; });
   y += 14 * s; ctx.letterSpacing = '0px'; ctx.font = `${size}px 'Oooh Baby'`;
   lines.forEach(line => { ctx.fillText(line, pad, y + size * .1); y += size * 1.25; });
-  y += 8 * s; ctx.font = `${26 * s}px 'Oooh Baby'`; ctx.fillStyle = '#6852ae'; ctx.textAlign = 'right'; ctx.fillText('— Raygan', cardW - pad - 4 * s, y + 4 * s);
-  y += 39 * s + 14 * s; ctx.font = `400 ${12 * s}px 'Bricolage Grotesque Variable'`; ctx.fillStyle = '#756a84'; ctx.textAlign = 'center';
+  y += 8 * s; ctx.font = `${26 * s}px 'Oooh Baby'`; ctx.fillStyle = tone.soft; ctx.textAlign = 'right'; ctx.fillText('— Raygan', cardW - pad - 4 * s, y + 4 * s);
+  y += 39 * s + 14 * s; ctx.font = `400 ${12 * s}px 'Bricolage Grotesque Variable'`; ctx.fillStyle = tone.soft; ctx.textAlign = 'center';
   ctx.fillText('Pick your card at reaganmarfo.com', cardW / 2, y);
   ctx.restore();
 
@@ -142,7 +152,7 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function Jar() {
+function Jar({paper}: {paper: string}) {
   const ink = {stroke: '#000047', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const};
   return <svg viewBox="0 0 120 140" className="card-jar-art" aria-hidden="true">
     <ellipse cx="60" cy="133" rx="38" ry="4.5" fill="#21153b" opacity=".12"/>
@@ -163,7 +173,7 @@ function Jar() {
       <path d="M46 66 L66 62.4 L68.6 77 L48 80 Z" fill="#fffdf7" strokeWidth="1.8" {...ink}/>
       <path d="M38 50 L58 46 L62 58.6 L41 62.4 Z" fill="#ffd3c4" strokeWidth="1.8" {...ink}/>
       <path d="M60 52 L80 50 L81 63 L61 64 Z" fill="#f2efff" strokeWidth="1.8" {...ink}/>
-      <path className="card-jar-picked" d="M54 30 L68 24 L73 38 L58.6 43 Z" fill="#ffe7a8" strokeWidth="1.8" {...ink}/>
+      <path className="card-jar-picked" d="M54 30 L68 24 L73 38 L58.6 43 Z" fill={paper} strokeWidth="1.8" {...ink}/>
       <path d="M42 36 L54 40.4 L50.6 50 L39 46 Z" fill="#ad93ff" strokeWidth="1.8" {...ink}/>
       <path d="M49 71.4 L66.6 68.4" fill="none" stroke="#ad93ff" strokeWidth="1.4"/>
       <path d="M28.6 92 C26 78 27.4 64 33.6 55.6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
@@ -239,7 +249,7 @@ export function DailyCardJar() {
   const showCard = phase === 'open' || phase === 'closing';
   return <>
     <div className={`card-overlay ${phase}`} aria-hidden="true"/>
-    <div ref={root} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}${tucked && phase === 'idle' ? ' tucked' : ''}`}>
+    <div ref={root} style={card ? {'--card-paper': card.tone.paper, '--card-shadow': card.tone.shadow, '--card-soft': card.tone.soft} as React.CSSProperties : undefined} className={`card-jar-wrap ${phase}${opened ? '' : ' fresh'}${tucked && phase === 'idle' ? ' tucked' : ''}`}>
     {card && showCard && <section className="card-pop" role="dialog" aria-label={`Your card for ${card.label}`}>
       <button ref={closeButton} type="button" className="card-pop-close" onClick={() => close()} aria-label="Put the card back">×</button>
       <p className="card-pop-date">Your card for {card.label}</p>
@@ -252,7 +262,7 @@ export function DailyCardJar() {
       <p className="card-pop-note" role="status">{notice || <>A new card lands tomorrow <span className="card-pop-wait">· in {wait}</span></>}</p>
     </section>}
     <button ref={jar} type="button" className="card-jar" onClick={() => phase === 'open' ? close() : open()} aria-expanded={showCard} aria-label={opened ? 'Read today’s card again' : 'Open the jar for today’s card'}>
-      <Jar/>
+      <Jar paper={card?.tone.paper ?? '#ffe7a8'}/>
     </button>
   </div>
   </>;
