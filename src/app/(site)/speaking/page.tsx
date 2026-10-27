@@ -9,7 +9,7 @@ export const metadata:Metadata={title:'Speaking + Hosting'};
 
 const reels=[
   {title:'The Becoming Experience',src:'/videos/the-becoming-experience.mp4',poster:'/images/reels/the-becoming-experience.jpg',length:'00:31'},
-  {title:'Building in Africa',src:site.reels[1],length:'00:31'},
+  {title:'Afternoon Show @ TV3',src:'/videos/afternoon-show-tv3.mp4',poster:'/images/reels/afternoon-show-tv3.jpg',length:'00:40'},
   {title:'Think Bigger',src:site.reels[2],length:'00:54'},
 ];
 export default function Speaking(){
