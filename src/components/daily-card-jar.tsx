@@ -8,12 +8,12 @@ const storageKey = 'raygan-daily-card';
 // Each day's card is one of the jar's note colours. The same colour is used for the note
 // that leaves the jar, the card it grows into, and the downloaded image.
 // Light, sticky-note shades so the dark handwriting stands out.
-// Each colour has its own matching ink (main text) and soft ink (signature, small print).
-const tones = [
-  {paper: '#fff1b8', shadow: '#ad93ff', ink: '#46370c', soft: '#7a5a10'},
-  {paper: '#ffdcc2', shadow: '#ad93ff', ink: '#5a2412', soft: '#8a3a1a'},
-  {paper: '#e6ddff', shadow: '#ad93ff', ink: '#2a1d6e', soft: '#4b3c8c'},
-];
+// Each colour has its own matching shadow, ink (main text) and soft ink (signature, small print).
+const yellow = {paper: '#fff1b8', shadow: '#f2c94c', ink: '#46370c', soft: '#7a5a10'};
+const orange = {paper: '#ffdcc2', shadow: '#f4a274', ink: '#5a2412', soft: '#8a3a1a'};
+const purple = {paper: '#e6ddff', shadow: '#ad93ff', ink: '#2a1d6e', soft: '#4b3c8c'};
+// Purple is the brand colour, so it comes up half the time.
+const tones = [purple, yellow, purple, orange];
 type Tone = typeof tones[number];
 
 // Each visitor has their own shuffled order of the cards, so two people rarely see the same
