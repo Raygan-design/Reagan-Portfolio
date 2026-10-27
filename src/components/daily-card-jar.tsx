@@ -23,27 +23,35 @@ function untilTomorrow() {
   const minutes = Math.max(1, Math.ceil((midnight.getTime() - now.getTime()) / 6e4)), h = Math.floor(minutes / 60), m = minutes % 60;
   return h ? `${h}h ${m}m` : `${m}m`;
 }
-// A soft pop, a paper rustle and a little two-note chime, synthesised so there is no audio file to load.
-function playOpenSound() {
+// Synthesised to follow the animation beat by beat (no audio file to load):
+// lid pops on tap, glass rattles with each swing of the shake, paper whooshes as the
+// card rises out of the jar, then a little chime as it settles.
+const shakeMs = 550, riseMs = 600;
+function playOpenSound(animated: boolean) {
   try {
-    const ctx = new AudioContext(), t = ctx.currentTime, out = ctx.createGain();
-    out.gain.value = .5; out.connect(ctx.destination);
-    const pop = ctx.createOscillator(), popGain = ctx.createGain();
-    pop.frequency.setValueAtTime(520, t); pop.frequency.exponentialRampToValueAtTime(140, t + .12);
-    popGain.gain.setValueAtTime(.5, t); popGain.gain.exponentialRampToValueAtTime(.001, t + .14);
-    pop.connect(popGain).connect(out); pop.start(t); pop.stop(t + .15);
-    const noise = ctx.createBuffer(1, ctx.sampleRate * .3, ctx.sampleRate), data = noise.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) * (Math.random() < .3 ? 1 : .3);
-    const rustle = ctx.createBufferSource(), band = ctx.createBiquadFilter(), rustleGain = ctx.createGain();
-    rustle.buffer = noise; band.type = 'bandpass'; band.frequency.value = 3200; band.Q.value = .8; rustleGain.gain.value = .18;
-    rustle.connect(band).connect(rustleGain).connect(out); rustle.start(t + .08);
-    [[1046.5, .32], [1568, .44]].forEach(([freq, at]) => {
-      const bell = ctx.createOscillator(), bellGain = ctx.createGain();
-      bell.type = 'sine'; bell.frequency.value = freq;
-      bellGain.gain.setValueAtTime(0, t + at); bellGain.gain.linearRampToValueAtTime(.16, t + at + .01); bellGain.gain.exponentialRampToValueAtTime(.001, t + at + .7);
-      bell.connect(bellGain).connect(out); bell.start(t + at); bell.stop(t + at + .75);
-    });
-    setTimeout(() => ctx.close(), 1500);
+    const ctx = new AudioContext(), t = ctx.currentTime + .02, out = ctx.createGain();
+    out.gain.value = .55; out.connect(ctx.destination);
+    const tone = (type: OscillatorType, from: number, to: number, at: number, length: number, level: number) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(from, at); osc.frequency.exponentialRampToValueAtTime(to, at + length);
+      gain.gain.setValueAtTime(0, at); gain.gain.linearRampToValueAtTime(level, at + .005); gain.gain.exponentialRampToValueAtTime(.001, at + length);
+      osc.connect(gain).connect(out); osc.start(at); osc.stop(at + length + .02);
+    };
+    const settle = animated ? (shakeMs + riseMs * .9) / 1000 : 0;
+    if (animated) {
+      tone('sine', 760, 240, t, .09, .45); // lid pops
+      [.125, .25, .375, .5].forEach((at, i) => tone('triangle', 2600 - i * 180, 2000, t + at * shakeMs / 1000 * 1.0, .05, .12 - i * .02)); // glass rattle on each swing
+      const length = riseMs / 1000, noise = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * length), ctx.sampleRate), data = noise.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+      const whoosh = ctx.createBufferSource(), band = ctx.createBiquadFilter(), gain = ctx.createGain(), at = t + shakeMs / 1000;
+      whoosh.buffer = noise; band.type = 'bandpass'; band.Q.value = 1.2;
+      band.frequency.setValueAtTime(900, at); band.frequency.exponentialRampToValueAtTime(4200, at + length * .45); band.frequency.exponentialRampToValueAtTime(2200, at + length);
+      gain.gain.setValueAtTime(0, at); gain.gain.linearRampToValueAtTime(.22, at + length * .4); gain.gain.exponentialRampToValueAtTime(.001, at + length);
+      whoosh.connect(band).connect(gain).connect(out); whoosh.start(at); whoosh.stop(at + length);
+    }
+    tone('sine', 1046.5, 1046.5, t + settle, .7, .16); // chime as the card lands
+    tone('sine', 1568, 1568, t + settle + .11, .8, .13);
+    setTimeout(() => ctx.close(), (settle + 1.2) * 1000);
   } catch {}
 }
 const motion = (ms: number) => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms;
@@ -158,8 +166,8 @@ export function DailyCardJar() {
 
   function open() {
     if (!card || phase !== 'idle') return;
-    setPhase('opening'); setNotice(''); setWait(untilTomorrow()); write(card.key); playOpenSound();
-    setTimeout(() => { setPhase('open'); setOpened(true); closeButton.current?.focus({preventScroll: true}); }, motion(550));
+    setPhase('opening'); setNotice(''); setWait(untilTomorrow()); write(card.key); playOpenSound(motion(1) > 0);
+    setTimeout(() => { setPhase('open'); setOpened(true); closeButton.current?.focus({preventScroll: true}); }, motion(shakeMs));
   }
   function close(returnFocus = true) {
     setPhase(p => p === 'open' ? 'closing' : p);

@@ -181,3 +181,4 @@
 .card-jar-wrap.tucked{transform:translateY(130%);opacity:0;pointer-events:none}
 
 .work-album.work-album-clean{grid-template-columns:1.2fr 1fr}.work-album.work-album-clean .mentorship{grid-column:auto}
+.support-fab{transition:transform .45s cubic-bezier(.5,0,.3,1),opacity .3s,background .2s,border-color .2s}.support-fab.tucked{transform:translateY(130%);opacity:0;pointer-events:none}
