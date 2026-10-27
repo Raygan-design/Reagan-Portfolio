@@ -227,6 +227,20 @@
 .contact-content .eyebrow{margin:0 0 16px}
 .contact-content h1{font-size:32px;margin-bottom:24px}
 @media(max-width:760px){.contact-content h1{font-size:30px;line-height:34px}}
-/* Paths: no heading; the section flows straight into the Speaking and Consulting rows. */
-.paths-section{padding-top:24px;padding-bottom:24px}
-@media(min-width:1101px){.path-row{grid-template-columns:minmax(0,1fr) minmax(0,2fr) 230px}.path-row>.button,.path-row>.text-button{justify-self:end}}
+/* Speaking and Consulting: a clean list; on hover the heading slides and a tilted photo peeks out beside it. */
+.paths-section{padding-top:40px;padding-bottom:56px}
+.path-link{position:relative;display:grid;grid-template-columns:60px minmax(0,1.2fr) 150px minmax(0,1fr) 200px;gap:32px;align-items:center;padding:44px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none}
+.path-link:last-child{border-bottom:1px solid var(--line)}
+.path-num{margin:0}
+.path-link h2{font-size:clamp(36px,4.2vw,64px);line-height:1;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+.path-link p{font-size:17px;line-height:26px;color:#555}
+.path-cta{justify-self:end;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--night);border-bottom:1px solid currentColor;padding-bottom:4px}
+.path-peek{position:relative;width:150px;aspect-ratio:4/5;margin-block:-40px;overflow:hidden;border-radius:6px;box-shadow:0 24px 50px -16px #0006;opacity:0;pointer-events:none;transform:translateY(16px) rotate(-6deg) scale(.85);transition:opacity .3s ease,transform .5s cubic-bezier(.22,1,.36,1);z-index:2}
+.path-peek-1{transform:translateY(16px) rotate(6deg) scale(.85)}
+.path-peek img{object-fit:cover}
+.path-link:hover h2,.path-link:focus-visible h2{transform:translateX(12px)}
+.path-link:hover .path-peek,.path-link:focus-visible .path-peek{opacity:1;transform:rotate(-4deg)}
+.path-link:hover .path-peek-1,.path-link:focus-visible .path-peek-1{transform:rotate(4deg)}
+@media(max-width:1100px){.path-link{grid-template-columns:48px minmax(0,1fr) minmax(0,1fr);row-gap:16px}.path-peek{display:none}.path-cta{grid-column:3;justify-self:start}}
+@media(max-width:760px){.paths-section{padding-top:24px;padding-bottom:40px}.path-link{grid-template-columns:1fr;gap:12px;padding:28px 0}.path-cta{grid-column:auto;margin-top:4px}}
+@media(prefers-reduced-motion:reduce){.path-link h2,.path-peek{transition:none}.path-link:hover h2,.path-link:focus-visible h2{transform:none}}
