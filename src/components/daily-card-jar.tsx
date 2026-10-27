@@ -8,15 +8,16 @@ const storageKey = 'raygan-daily-card';
 // Each day's card is one of the jar's note colours. The same colour is used for the note
 // that leaves the jar, the card it grows into, and the downloaded image.
 // Light, sticky-note shades so the dark handwriting stands out.
-// Sticky-note colours: the card is the light shade, the shadow is the full colour, and the
+// Sticky-note colours: the card is the light shade, the shadow is the full colour (or, for
+// orange, yellow and peach, the dark ink, which suits those warm shades better), and the
 // ink (main text) and soft ink (signature, small print) are dark shades of the same colour.
 const purple = {paper: '#e6ddff', shadow: '#ad93ff', ink: '#2a1d6e', soft: '#4b3c8c'};
 const pink = {paper: '#ffdcec', shadow: '#ff5aa8', ink: '#6b1240', soft: '#a01f5c'};
-const orange = {paper: '#ffe2c8', shadow: '#ff9433', ink: '#5a2a0c', soft: '#8f3f0c'};
-const yellow = {paper: '#fff4b5', shadow: '#ffd21f', ink: '#463a05', soft: '#6e5a08'};
+const orange = {paper: '#ffe2c8', shadow: '#5a2a0c', ink: '#5a2a0c', soft: '#8f3f0c'};
+const yellow = {paper: '#fff4b5', shadow: '#463a05', ink: '#463a05', soft: '#6e5a08'};
 const green = {paper: '#e3f7c9', shadow: '#86d13b', ink: '#22410b', soft: '#3a6614'};
 const blue = {paper: '#d8eeff', shadow: '#2ea6f0', ink: '#0b3557', soft: '#195a8c'};
-const peach = {paper: '#ffe0d6', shadow: '#ff8a6b', ink: '#5c2014', soft: '#923523'};
+const peach = {paper: '#ffe0d6', shadow: '#5c2014', ink: '#5c2014', soft: '#923523'};
 // Purple is the brand colour, so it comes up more often than the others (3 in 9).
 const tones = [purple, pink, orange, purple, yellow, green, purple, blue, peach];
 type Tone = typeof tones[number];
