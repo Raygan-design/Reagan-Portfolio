@@ -286,3 +286,13 @@
 }
 @media(prefers-reduced-motion:reduce){.pc-8 *{transition:none!important}}
 
+
+/* About: testimonials in the mentorship note */
+.mentor-quotes{display:grid;gap:22px}
+.mentor-quotes figure{margin:0;padding-top:22px;border-top:1px solid #ffffff26}
+.mentor-quotes blockquote{margin:0 0 16px;font-size:17px!important;line-height:1.5!important;color:#fff}
+.mentor-quotes figcaption{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;color:#fff}
+.mentor-quotes figcaption img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.mentor-quotes figcaption a:hover{text-decoration:underline}
+.mentor-quotes small{display:block;font-size:12px;font-weight:400;color:#bbb}
+@media(max-width:760px){.mentor-quotes blockquote{font-size:16px!important}}
