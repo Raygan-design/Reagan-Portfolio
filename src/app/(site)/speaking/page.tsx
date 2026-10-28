@@ -20,7 +20,7 @@ export default function Speaking(){
   {name:'Purpose Circles',images:images.slice(12,21)},
  ];
  return <div className="page-entrance" key="speaking">
-  <section className="section speaking-hero"><div><p className="eyebrow">SPEAKING + EVENT HOSTING</p><h1>Ideas for rooms ready to think bigger.</h1></div><div><p>Book me to speak, join a panel, moderate a conversation or host your next gathering.</p><Link className="button" href="/speaking/enquiry">MAKE ENQUIRY <Arrow/></Link></div></section>
+  <section className="section speaking-hero"><div><p className="eyebrow">KEYNOTES · PANELS · HOSTING</p><h1>Speaking + Event Hosting</h1></div><div><p>Book me to speak, join a panel, moderate a conversation or host your next gathering.</p><Link className="button" href="/speaking/enquiry">MAKE ENQUIRY <Arrow/></Link></div></section>
   <section className="section speaking-content">
    <EventAlbums albums={albums}/>
    <div className="reels"><div className="section-heading"><h2>Portrait showreels</h2><p>Short moments from talks, panels and hosted conversations.</p></div><div className="reel-grid">{reels.map((reel,index)=><Reel key={reel.title} index={index} src={reel.src} poster={'poster' in reel?reel.poster:undefined} title={reel.title} label={`REEL 0${index+1} / ${reel.length}`}/>)}</div></div>
