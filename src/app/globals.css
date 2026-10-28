@@ -316,3 +316,14 @@
 .home-hero{min-height:622px}
 @media(max-width:1100px){.home-hero{min-height:570px}}
 @media(max-width:760px){.home-hero{min-height:0;padding-top:24px;padding-bottom:28px;gap:24px}.home-intro .handwritten{margin-top:14px}}
+
+/* About: quick facts beside the portrait */
+.at-a-glance{display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:32px!important}
+.at-a-glance .eyebrow{color:#ad93ff}
+.at-a-glance dl{display:grid;grid-template-columns:1fr 1fr;gap:28px 24px;margin:0}
+.at-a-glance dl>div{padding-top:16px;border-top:1px solid #ffffff2e}
+.at-a-glance dt{font-size:clamp(34px,3.6vw,54px);font-weight:700;letter-spacing:-.04em;line-height:1;color:#fff}
+.at-a-glance dl>div:last-child dt{font-size:clamp(22px,2vw,30px);line-height:1.15;letter-spacing:-.02em}
+.at-a-glance dd{margin:10px 0 0;font-size:15px;line-height:1.4;color:#c9c6ef}
+.at-a-glance .handwritten{font-size:40px;color:#d9ccff}
+@media(max-width:760px){.at-a-glance{padding:24px!important;gap:22px}.at-a-glance dl{gap:22px 18px}.at-a-glance dt{font-size:34px}.at-a-glance dl>div:last-child dt{font-size:21px}.at-a-glance dd{font-size:14px}.at-a-glance .handwritten{font-size:32px}}
