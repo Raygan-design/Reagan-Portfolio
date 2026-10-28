@@ -18,7 +18,8 @@ const paths=[
     // Client testimonials: add {quote,name,role} entries and the card turns over to them
     // instead of the photos.
     quotes:[
-      {quote:'Reagan made design feel practical and attainable. Watching him design live opened my mind to how far I could take it, and gave me the confidence to pursue this path.',name:'Emmanuel Peter Amexo',role:'Product Designer, MTN Ghana',photo:'/images/testimonials/emmanuel-amexo.webp',href:'https://www.linkedin.com/in/emmanuel-peter-amexo-09a0b11b8/'},
+      {quote:'Reagan made design feel practical and attainable. His videos and design insights helped me sharpen my UI/UX skills. Watching him design live opened my mind to how far I could take it, and gave me the confidence to pursue this path.',name:'Emmanuel Peter Amexo',role:'Product Designer, MTN Ghana',photo:'/images/testimonials/emmanuel-amexo.webp',href:'https://www.linkedin.com/in/emmanuel-peter-amexo-09a0b11b8/'},
+      {quote:'Reagan was always willing to review my work, challenge my thinking and share his experience. He helped me see not only how to improve, but why, and guided me from freelancing into my first full-time design role.',name:'Kwabena Safo',role:'Designer',photo:'/images/testimonials/kwabena-safo.jpg',href:'https://www.linkedin.com/in/kwabenasafo/'},
     ] as Quote[]},
 ];
 
@@ -46,8 +47,8 @@ export function PathsDesk(){const [turned,setTurned]=useState<number[]>([]);cons
   <div className="pc8-desk">
     {paths.map((p,i)=><div key={p.key} className="pc8-slot"><div className={`pc8-polaroid p${i}${turned.includes(i)?' turned':''}`} onClick={e=>{if((e.target as HTMLElement).closest('a'))return;turn(i)}}>
       <div className="pc8-inner">
-        <div className="pc8-info"><span className="pc8-tape" aria-hidden="true"/><div className="pc8-info-top"><span className="eyebrow">{p.num} / {p.label}</span><span className="pc8-flip">{p.quotes?.length?'kind words':p.flip} ↻</span></div><h2>{p.title}</h2><p>{p.text}</p><ul>{p.topics.map(t=><li key={t}>{t}</li>)}</ul><Link className="button" href={p.href}>{p.cta} <Arrow/></Link></div>
-        <div className="pc8-pics"><span className="pc8-tape" aria-hidden="true"/>{p.quotes?.length?<Quotes quotes={p.quotes} playing={turned.includes(i)}/>:<Slides images={p.images??[]} playing={turned.includes(i)}/>}<span className="handwritten">{p.quotes?.length?'Kind words':p.short}</span></div>
+        <div className="pc8-info"><span className="pc8-tape" aria-hidden="true"/><div className="pc8-info-top"><span className="eyebrow">{p.num} / {p.label}</span><span className="pc8-flip">{p.quotes?.length?'testimonials':p.flip} ↻</span></div><h2>{p.title}</h2><p>{p.text}</p><ul>{p.topics.map(t=><li key={t}>{t}</li>)}</ul><Link className="button" href={p.href}>{p.cta} <Arrow/></Link></div>
+        <div className="pc8-pics"><span className="pc8-tape" aria-hidden="true"/>{p.quotes?.length?<Quotes quotes={p.quotes} playing={turned.includes(i)}/>:<Slides images={p.images??[]} playing={turned.includes(i)}/>}<span className="handwritten">{p.quotes?.length?'Testimonials':p.short}</span></div>
       </div>
     </div></div>)}
   </div>
