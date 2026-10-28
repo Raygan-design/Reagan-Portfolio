@@ -269,6 +269,8 @@
 .pc8-avatar{display:grid;place-items:center;flex:none;width:44px;height:44px;object-fit:cover;border-radius:50%;background:var(--indigo);color:var(--night);font-size:13px;font-weight:800}
 .pc8-quotes img.pc8-avatar{opacity:1;transform:none;transition:none}
 .pc8-quotes~.pc8-dots i{background:#fff5}.pc8-quotes~.pc8-dots i.on{background:var(--indigo)}
+.pc8-quotes blockquote{flex-shrink:0}
+@media(max-width:1000px){.pc8-polaroid{height:480px}.pc8-quotes figure{padding:20px 20px 30px}.pc8-mark{font-size:66px;height:36px}.pc8-quotes blockquote{font-size:16px;line-height:1.42}}
 @media(max-width:1000px){
 .pc8-desk{flex-wrap:wrap;gap:44px 28px;padding-top:24px}
 .pc8-slot{width:min(340px,100%)}
