@@ -25,6 +25,15 @@ export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?
   }, [confirmedReference]);
   return <><div ref={scene} className="moving-scene" data-paused={paused} role="img" aria-label="An illustrated traveller in purple walking along a neighborhood street with passing cars, a cyclist, detailed houses and leafy trees behind him">
     <span className="moving-annotation handwritten">Still moving. Still creating.</span>
+    <MovingStreet/>
+    <span className="moving-destination">On to the next idea</span>
+  </div><button type="button" className="moving-toggle" onClick={() => setPaused(value => !value)} aria-pressed={paused}>{paused ? 'Resume motion' : 'Pause motion'}</button></>;
+}
+
+// The street itself (sky, houses, road, traffic and the walking traveller), shared with the
+// homepage intro.
+export function MovingStreet() {
+  return <>
     <div className="moving-sky" aria-hidden="true"><span className="moving-cloud moving-cloud-one"/><span className="moving-cloud moving-cloud-two"/><span className="moving-sun"/></div>
     <MovingNeighborhood/>
     <div className="moving-road" aria-hidden="true"><span className="moving-road-edge"/><span className="moving-road-marks"/></div>
@@ -57,8 +66,7 @@ export function MovingMan({verifiedPaymentReference}: {verifiedPaymentReference?
     </div>
     <div className="moving-sidewalk" aria-hidden="true"><span/></div>
     <div className="moving-traveller" aria-hidden="true"/>
-    <span className="moving-destination">On to the next idea</span>
-  </div><button type="button" className="moving-toggle" onClick={() => setPaused(value => !value)} aria-pressed={paused}>{paused ? 'Resume motion' : 'Pause motion'}</button></>;
+  </>;
 }
 
 function StreetCar({className}: {className: string}) {
