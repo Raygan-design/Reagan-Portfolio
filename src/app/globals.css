@@ -233,9 +233,8 @@
 /* Speaking / Consulting polaroid desk */
 .pc-8{background:#fafaf7;padding-block:clamp(48px,6vw,90px);overflow:hidden}
 .pc-8 h2{letter-spacing:-.04em}.pc-8 .eyebrow,.pc-8 .handwritten{margin:0}
-.pc8-desk{position:relative;display:flex;justify-content:center;gap:clamp(24px,4vw,64px);padding:60px 0 20px;perspective:1600px}
-.pc8-label{position:absolute;top:0;left:50%;font-size:34px;color:var(--night);transform:translateX(-50%) rotate(-2deg);white-space:nowrap}
-.pc8-slot{display:flex;justify-content:center;width:min(360px,44%)}
+.pc8-desk{position:relative;display:flex;justify-content:center;gap:clamp(24px,4vw,64px);padding:24px 0 20px;perspective:1600px}
+.pc8-slot{display:flex;justify-content:center;width:min(420px,44%)}
 .pc8-polaroid{position:relative;width:100%;aspect-ratio:360/450;cursor:pointer;transition:transform .8s cubic-bezier(.22,1,.36,1)}
 .pc8-polaroid.p0{transform:rotate(-3deg) translateY(10px)}.pc8-polaroid.p1{transform:rotate(2.5deg)}
 @media(hover:hover){.pc8-polaroid:hover{transform:rotate(0) translateY(-6px)}}
@@ -253,14 +252,24 @@
 .pc8-info ul{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
 .pc8-info li{font-size:13px;padding:5px 11px;border-radius:99px;background:var(--mist);color:var(--night)}
 .pc8-info .button{margin-top:auto}
+@media(min-width:1001px){.pc8-info{gap:18px;padding:34px 32px 30px}.pc8-info .eyebrow{font-size:12px}.pc8-flip{font-size:13px}.pc8-info h2{font-size:clamp(30px,2.7vw,40px)}.pc8-info p{font-size:17px;line-height:27px}.pc8-info li{font-size:14px;padding:6px 13px}}
 .pc8-pics{transform:rotateY(180deg);padding:14px 14px 0}
 .pc8-photo{position:relative;height:calc(100% - 72px);overflow:hidden;background:#eee}
 .pc8-photo img{object-fit:cover;opacity:0;transform:scale(1.04);transition:opacity .9s ease,transform 3.5s ease-out}.pc8-photo img.on{opacity:1;transform:scale(1)}
 .pc8-dots{position:absolute;left:0;right:0;bottom:62px;display:flex;justify-content:center;gap:5px;transform:translateY(-14px)}
 .pc8-dots i{width:6px;height:6px;border-radius:50%;background:#fff8;transition:background .3s,width .3s}.pc8-dots i.on{width:16px;border-radius:3px;background:#fff}
-.pc8-pics .handwritten{display:block;text-align:center;font-size:32px;line-height:58px;color:var(--night)}
+.pc8-pics .handwritten{display:block;text-align:center;font-size:28px;white-space:nowrap;line-height:58px;color:var(--night)}
+.pc8-quotes{background:var(--night);color:#fff}
+.pc8-quotes figure{position:absolute;inset:0;margin:0;display:flex;flex-direction:column;padding:26px 24px 40px;opacity:0;transform:translateY(8px);transition:opacity .7s ease,transform .7s ease}
+.pc8-quotes figure.on{opacity:1;transform:none}
+.pc8-mark{font-family:Georgia,serif;font-size:84px;line-height:.8;color:var(--indigo);height:46px}
+.pc8-quotes blockquote{margin:6px 0 auto;font-size:clamp(17px,1.5vw,20px);line-height:1.38;font-weight:500;letter-spacing:-.01em}
+.pc8-quotes figcaption{display:flex;align-items:center;gap:12px;padding-top:16px;border-top:1px solid #ffffff26;font-size:12px;color:#ffffffb0}
+.pc8-quotes figcaption b{display:block;font-size:14px;color:#fff}
+.pc8-avatar{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:var(--indigo);color:var(--night);font-size:13px;font-weight:800}
+.pc8-quotes~.pc8-dots i{background:#fff5}.pc8-quotes~.pc8-dots i.on{background:var(--indigo)}
 @media(max-width:1000px){
-.pc8-desk{flex-wrap:wrap;gap:44px 28px;padding-top:56px}
+.pc8-desk{flex-wrap:wrap;gap:44px 28px;padding-top:24px}
 .pc8-slot{width:min(340px,100%)}
 .pc8-polaroid{aspect-ratio:auto;height:450px}
 .pc8-polaroid.p0{transform:rotate(-2.5deg)}.pc8-polaroid.p1{transform:rotate(2deg)}
