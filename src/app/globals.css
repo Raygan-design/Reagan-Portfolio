@@ -265,3 +265,56 @@
 .pc8-back p{font-size:15px;line-height:22px}
 }
 @media(prefers-reduced-motion:reduce){.pc-8 *{transition:none!important}}
+/* PREVIEW-INTRO (remove before shipping) */
+.intro{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--night);color:#fff;cursor:pointer;overflow:hidden;user-select:none}
+.intro-foot{position:absolute;left:0;right:0;bottom:clamp(28px,6vh,56px);display:flex;justify-content:center}
+.intro-count{font-size:12px;letter-spacing:.18em;font-variant-numeric:tabular-nums;opacity:.75}
+.intro.is-ready .intro-count{animation:intro-pulse 1.8s ease-in-out infinite}
+@keyframes intro-pulse{50%{opacity:.3}}
+.intro-skip{position:absolute;right:var(--gutter);top:22px;padding:8px 14px;border:1px solid currentColor;border-radius:99px;background:none;color:inherit;font-size:11px;letter-spacing:.16em;opacity:.6;cursor:pointer}
+.intro-skip:hover{opacity:1}
+.intro.is-leaving{pointer-events:none}
+/* 1 · written */
+.intro1-corners{position:absolute;top:26px;left:var(--gutter);right:calc(var(--gutter) + 80px);display:flex;justify-content:space-between;font-size:11px;letter-spacing:.18em;opacity:.6}
+.intro1-line{margin:0;font-family:'Oooh Baby',cursive;font-size:clamp(56px,11vw,168px);line-height:1.2;white-space:nowrap}
+.intro1-line{text-align:center}.intro1-line span{display:inline-block;padding:0 .06em;clip-path:inset(-20% calc(100% - var(--w)*100%) -20% 0)}
+.intro1-line span:first-child{--w:min(1,var(--pct)*2.2)}.intro1-line span:last-child{--w:max(0,var(--pct)*1.8 - .8)}
+.intro1-name{position:absolute;bottom:calc(clamp(28px,6vh,56px) + 34px);margin:0;font-size:12px;letter-spacing:.3em;opacity:.0;transition:opacity .6s}
+.intro-1.is-ready .intro1-name{opacity:.7}
+.intro-1.is-leaving{background:transparent;transition:background .9s .35s ease}
+.intro-1.is-leaving .intro1-line{transform:scale(14);opacity:0;transition:transform 1.2s cubic-bezier(.7,0,.3,1),opacity .5s .7s}
+.intro-1.is-leaving .intro1-corners,.intro-1.is-leaving .intro1-name,.intro-1.is-leaving .intro-foot,.intro-1.is-leaving .intro-skip{opacity:0;transition:opacity .3s}
+/* 2 · on air */
+.intro2-sign{padding:clamp(18px,3vw,30px) clamp(30px,5vw,56px);border:2px solid #ffffff40;border-radius:14px;transition:background .6s,border-color .6s,box-shadow .6s,transform 1.2s cubic-bezier(.7,0,.3,1)}
+.intro2-sign span{display:block;font-size:clamp(44px,8vw,110px);font-weight:700;letter-spacing:.06em;line-height:1;color:#ffffff30;transition:color .6s}
+.intro-2.is-ready .intro2-sign,.intro-2.is-leaving .intro2-sign{background:var(--indigo);border-color:var(--indigo);box-shadow:0 0 60px 6px #ad93ff80,0 0 180px 40px #ad93ff30}
+.intro-2.is-ready .intro2-sign span,.intro-2.is-leaving .intro2-sign span{color:var(--night)}
+.intro2-wave{display:flex;align-items:center;gap:4px;height:56px;margin-top:clamp(34px,6vh,60px);width:min(480px,80vw)}
+.intro2-wave i{flex:1;height:var(--h);border-radius:2px;background:#ffffff26;transform-origin:center;animation:intro-bar 1.1s ease-in-out var(--d) infinite alternate;transition:background .3s}
+.intro2-wave i.on{background:var(--indigo)}
+@keyframes intro-bar{from{transform:scaleY(.45)}to{transform:scaleY(1)}}
+.intro2-show{margin:22px 0 0;font-size:12px;letter-spacing:.3em;opacity:.7}
+.intro-2.is-leaving{background:transparent;transition:background .5s .75s}
+.intro-2.is-leaving .intro2-sign{transform:scale(30);transition:transform 1.2s cubic-bezier(.7,0,.3,1),opacity .4s .85s;opacity:0}
+.intro-2.is-leaving .intro2-sign span{opacity:0;transition:opacity .2s}
+.intro-2.is-leaving .intro2-wave,.intro-2.is-leaving .intro2-show,.intro-2.is-leaving .intro-foot,.intro-2.is-leaving .intro-skip{opacity:0;transition:opacity .3s}
+/* 3 · walk in */
+.intro-3{background:#fafaf7;color:var(--night)}
+.intro3-scene{position:relative;width:min(760px,86vw);height:300px}
+.intro3-door{position:absolute;right:0;bottom:0;width:120px;height:250px;border:2px solid var(--night);border-bottom:0;transform-origin:50% 60%;transition:transform 1.3s cubic-bezier(.7,0,.3,1)}
+.intro3-door span{position:absolute;inset:0;background:var(--night);opacity:.06;transition:opacity .6s,background .6s}
+.intro-3.is-ready .intro3-door span{background:var(--indigo);opacity:.35}
+.intro3-track{position:absolute;left:0;right:120px;bottom:0;height:2px;background:#00004720}
+.intro3-track i{position:absolute;inset:0;background:var(--night);transform-origin:left;transform:scaleX(var(--pct))}
+.intro3-man{position:absolute;bottom:2px;left:calc((100% - 120px - 96px) * var(--pct));width:96px;height:144px;background:url('/images/moving-man/walking-sprite.svg') 0 0/480px 144px no-repeat;animation:intro-walk .7s steps(5) infinite}
+.intro-3.is-ready .intro3-man{animation:none;background-position:0 0}
+@keyframes intro-walk{to{background-position-x:-480px}}
+.intro3-name{margin:36px 0 0;font-size:12px;letter-spacing:.3em;opacity:.7}
+.intro-3.is-leaving{background:transparent;transition:background .5s .8s}
+.intro-3.is-leaving .intro3-man{left:calc(100% - 108px);opacity:0;animation:intro-walk .7s steps(5) infinite;transition:left .6s linear,opacity .3s .4s}
+.intro-3.is-leaving .intro3-door{transform:scale(18);transition-delay:.45s}
+.intro-3.is-leaving .intro3-door span{background:#fafaf7;opacity:1}
+.intro-3.is-leaving .intro3-track,.intro-3.is-leaving .intro3-name,.intro-3.is-leaving .intro-foot,.intro-3.is-leaving .intro-skip{opacity:0;transition:opacity .3s}
+@media(max-width:760px){.intro1-line{font-size:22vw;line-height:1;white-space:normal}.intro1-line span{display:block}.intro1-corners{flex-direction:column;gap:6px;right:auto}.intro3-scene{height:240px}.intro3-door{width:90px;height:190px}.intro3-track{right:90px}.intro3-man{left:calc((100% - 90px - 72px) * var(--pct));width:72px;height:108px;background-size:360px 108px}@keyframes intro-walk{to{background-position-x:-360px}}.intro-3.is-leaving .intro3-man{left:calc(100% - 80px)}}
+@media(prefers-reduced-motion:reduce){.intro *{animation:none!important;transition:none!important}.intro.is-leaving{opacity:0;transition:opacity .4s!important}}
+/* END PREVIEW-INTRO */
