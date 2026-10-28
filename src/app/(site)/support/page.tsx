@@ -1,10 +1,11 @@
 import type {Metadata} from 'next';
+import {pageMetadata} from '@/lib/seo';
 import {SupportAmount} from '@/components/support-amount';
 import {SupportPaymentProvider} from '@/components/support-payment-provider';
 import {MovingMan} from '@/components/moving-man';
 import {JourneyMusic} from '@/components/journey-music';
 
-export const metadata: Metadata = {title: 'Keep the Moving Man going', description: 'Put a little fuel in Reagan’s creative journey.'};
+export const metadata: Metadata = pageMetadata({title: 'Keep the Moving Man going', path: '/support', image: 'support', description: 'Put a little fuel in Reagan Marfo’s creative journey. Every contribution helps keep the work, ideas and conversations moving.'});
 
 export default function Support() {
   return <SupportPaymentProvider><div className="support-page-shell"><JourneyMusic/><div className="page-entrance support-page">

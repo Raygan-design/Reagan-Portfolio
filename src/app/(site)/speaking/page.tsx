@@ -1,11 +1,12 @@
 import {Arrow} from '@/components/arrow';
+import {pageMetadata} from '@/lib/seo';
 import type {Metadata} from 'next';
 import Link from 'next/link';
 import paper from '@/content/paper.json';
 import {EventAlbums,Reel,type EventAlbum} from '@/components/media';
 import {site} from '@/lib/site';
 
-export const metadata:Metadata={title:'Speaking + Hosting'};
+export const metadata:Metadata=pageMetadata({title:'Speaking + Event Hosting',path:'/speaking',image:'speaking',description:'Book Reagan Marfo to speak, join a panel, moderate a conversation or host your event. Talks on creativity, design, technology, entrepreneurship and purpose.'});
 
 const reels=[
   {title:'The Becoming Experience',src:'/videos/the-becoming-experience.mp4',poster:'/images/reels/the-becoming-experience.jpg',length:'00:31'},

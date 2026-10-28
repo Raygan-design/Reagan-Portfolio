@@ -6,14 +6,15 @@ import './globals.css';
 import {SmoothScroll} from '@/components/smooth-scroll';
 import {SupportFab} from '@/components/support-fab';
 import { site } from '@/lib/site';
+import { pageMetadata, personJsonLd, SITE_NAME } from '@/lib/seo';
 
+const {alternates:_canonical,...defaults}=pageMetadata({title:'Reagan Marfo — Creative Entrepreneur',absoluteTitle:true,path:'/',description:'I’m Reagan Marfo, a Ghanaian creative entrepreneur building products, media, stories and communities. Product designer, podcast host and speaker.'});
 export const metadata: Metadata = {
+  // Defaults for any page without its own; each page sets its own canonical link.
+  ...defaults,
   metadataBase: new URL(site.url), title: { default:'Reagan Marfo — Creative Entrepreneur', template:'%s — Reagan Marfo' },
-  description:'I’m Reagan Marfo, a creative entrepreneur building products, media, stories and communities.',
-  // The link preview card (public/og.jpg): portrait, three lines from the hero and the signature.
-  openGraph:{title:'Reagan Marfo — Creative Entrepreneur',description:'Building products, telling stories and growing communities. Created to Create.',type:'website',siteName:'Reagan Marfo',images:[{url:'/og.jpg',width:1200,height:630,alt:'Reagan Marfo, creative entrepreneur'}]},
-  twitter:{card:'summary_large_image',title:'Reagan Marfo — Creative Entrepreneur',description:'Building products, telling stories and growing communities. Created to Create.',images:['/og.jpg']},
+  applicationName:SITE_NAME,authors:[{name:'Reagan Marfo',url:site.url}],creator:'Reagan Marfo',
 };
 export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en"><body><a className="skip-link" href="#main">Skip to content</a>{children}<SmoothScroll/><SupportFab/></body></html>;
+  return <html lang="en"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(personJsonLd()).replace(/</g,'\\u003c')}}/><a className="skip-link" href="#main">Skip to content</a>{children}<SmoothScroll/><SupportFab/></body></html>;
 }

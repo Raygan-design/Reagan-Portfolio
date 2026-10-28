@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import {pageMetadata} from '@/lib/seo';
 import Image from 'next/image';
 import paper from '@/content/paper.json';
 import {MentorQuotes} from '@/components/mentor-quotes';
-export const metadata:Metadata={title:{absolute:'About — Becoming Reagan Marfo'}};
+export const metadata:Metadata=pageMetadata({title:'About — Becoming Reagan Marfo',absoluteTitle:true,path:'/about',image:'about',description:'How Reagan Marfo went from designing graphics on campus to product design, founding thedsgnjunkies and Greyend Studio, and hosting Unscripted with Raygan.'});
 const t=paper['4I4-0'].text, photos=paper['4I4-0'].images;
 function Photo({i,alt,className=''}:{i:number;alt:string;className?:string}){return <div className={`album-photo ${className}`}><Image src={photos[i]} alt={alt} fill sizes="(max-width:700px) 90vw, 50vw"/></div>}
 function Chapter({date,title,paragraphs}:{date:number;title:number;paragraphs:number[]}){return <div className="chapter-copy"><p className="eyebrow">{t[date]}</p><h2>{t[title]}</h2><div className="chapter-paragraphs">{paragraphs.map(i=><p key={i}>{t[i]}</p>)}</div></div>}

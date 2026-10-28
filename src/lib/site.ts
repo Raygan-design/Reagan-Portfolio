@@ -1,6 +1,8 @@
 export const site = {
   email: 'reagan@teamraygan.com',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  // Production always uses the custom domain, so search engines and link previews never point at the
+  // vercel.app address; other environments use NEXT_PUBLIC_SITE_URL or localhost.
+  url: process.env.VERCEL_ENV === 'production' ? 'https://www.reaganmarfo.com' : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   socials: [
     {label: 'Instagram', href: process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/rayganofficial'},
     {label: 'TikTok', href: 'https://www.tiktok.com/@rayganofficial'},
