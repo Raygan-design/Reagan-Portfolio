@@ -1,68 +1,77 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {MovingStreet} from '@/components/moving-man';
+import {useScrollIntro,type IntroStage} from '@/components/intro/use-scroll-intro';
+import type {IntroScene} from '@/components/intro/three-kit';
 
-// Preview only (?intro=1…3): three loading intros that sit over the homepage while it loads,
-// count to 100, then wait for a scroll, swipe, tap or key before moving the visitor in.
-type Stage='loading'|'ready'|'leaving'|'done';
-const loadTime=2200,leaveTime=1300;
+// Preview only (?intro=1…3): three scroll-driven loading intros over the homepage. Scrolling
+// moves through each one and its last frame matches the homepage, so the site takes over
+// without a cut.
 
-function useIntro(){
-  const [stage,setStage]=useState<Stage>('loading');const [pct,setPct]=useState(0);
-  const stageRef=useRef(stage);stageRef.current=stage;
-  useEffect(()=>{
-    const root=document.documentElement;root.style.overflow='hidden';
-    const start=performance.now();let raf=0;
-    const tick=(t:number)=>{const p=Math.min(1,(t-start)/loadTime);setPct(Math.round((1-Math.pow(1-p,3))*100));if(p<1)raf=requestAnimationFrame(tick);else setStage('ready')};
-    raf=requestAnimationFrame(tick);
-    return ()=>{cancelAnimationFrame(raf);root.style.overflow=''};
-  },[]);
-  const enter=()=>{if(stageRef.current!=='ready')return;setStage('leaving');setTimeout(()=>{
-    setStage('done');document.documentElement.style.overflow='';window.scrollTo(0,0);
-    const hero=document.querySelector<HTMLElement>('.home-entrance');if(hero){hero.style.animation='none';void hero.offsetWidth;hero.style.animation=''}
-  },leaveTime)};
-  const skip=()=>{stageRef.current='ready';enter()};
-  useEffect(()=>{
-    let y0=0;
-    const wheel=(e:WheelEvent)=>{if(e.deltaY>4)enter()};
-    const ts=(e:TouchEvent)=>{y0=e.touches[0].clientY};const tm=(e:TouchEvent)=>{if(y0-e.touches[0].clientY>24)enter()};
-    const key=(e:KeyboardEvent)=>{if(['ArrowDown','PageDown',' ','Enter'].includes(e.key))enter()};
-    addEventListener('wheel',wheel,{passive:true});addEventListener('touchstart',ts,{passive:true});addEventListener('touchmove',tm,{passive:true});addEventListener('keydown',key);
-    return ()=>{removeEventListener('wheel',wheel);removeEventListener('touchstart',ts);removeEventListener('touchmove',tm);removeEventListener('keydown',key)};
-  });
-  return {stage,pct,enter,skip};
-}
-
-function Shell({id,stage,pct,enter,skip,children,hint='SCROLL TO ENTER'}:{id:number;stage:Stage;pct:number;enter:()=>void;skip:()=>void;children:React.ReactNode;hint?:string}){
-  return <div className={`intro intro-${id} is-${stage}`} data-lenis-prevent onClick={enter} style={{['--pct' as string]:pct/100}}>
-    {children}
-    <div className="intro-foot"><span className="intro-count">{stage==='loading'?`${pct}%`:hint}</span></div>
-    <button className="intro-skip" onClick={e=>{e.stopPropagation();skip()}}>SKIP</button>
+function Hud({stage,pct,play,hint,tone}:{stage:IntroStage;pct:number;play:(s?:number)=>void;hint:string;tone:'dark'|'light'}){
+  return <div className={`intro-hud intro-hud-${tone}`}>
+    <p className="intro-name">REAGAN MARFO</p>
+    <div className="intro-foot"><span className="intro-count">{stage==='loading'?`${String(pct).padStart(2,'0')}%`:hint}</span>{stage!=='loading'&&<span className="intro-cue" aria-hidden="true"/>}</div>
+    <button className="intro-skip" onClick={e=>{e.stopPropagation();play(1.2)}}>SKIP</button>
   </div>;
 }
 
-// 1 · "Created to Create." writes itself in the handwriting font, then the words zoom past you.
-function Written(){const s=useIntro();if(s.stage==='done')return null;return <Shell id={1} {...s}>
-  <div className="intro1-corners"><span>I DO ALOT OF THINGS</span><span>I AM A BORING PERSON</span></div>
-  <p className="intro1-line"><span>Created</span> <span>to Create.</span></p>
-  <p className="intro1-name">REAGAN MARFO</p>
-</Shell>}
+// 1 · Through the letters: RAYGAN is cut out of a navy screen, so the homepage shows through the
+// letters. Scrolling zooms into the R until its stroke fills the screen and the page is just there.
+function Letters(){
+  const zoom=useRef<SVGGElement>(null),outlineZoom=useRef<SVGGElement>(null),hole=useRef<SVGTextElement>(null),outline=useRef<SVGTextElement>(null);
+  const [size,setSize]=useState({w:1440,h:900});const origin=useRef({x:0,y:0});
+  useEffect(()=>{const fit=()=>setSize({w:innerWidth,h:innerHeight});fit();addEventListener('resize',fit);return ()=>removeEventListener('resize',fit)},[]);
+  const measured=useRef('');
+  useEffect(()=>{measured.current=''},[size]);
+  const {stage,pct,overlayRef,play}=useScrollIntro({sceneReady:true,replayAt:'ready',onFrame:(p,_t,since)=>{
+    // Aim at the middle of the R's stem, measured once the font has loaded.
+    const key=`${size.w}x${size.h}`;
+    if(measured.current!==key&&hole.current&&document.fonts.check(`800 40px 'Bricolage Grotesque Variable'`)){const r=hole.current.getExtentOfChar(0);origin.current={x:r.x+r.width*.17,y:r.y+r.height*.6};measured.current=key}
+    const s=1+Math.pow(p,2.4)*160,{x,y}=origin.current;const tr=`translate(${x} ${y}) scale(${s}) translate(${-x} ${-y})`;
+    zoom.current?.setAttribute('transform',tr);outlineZoom.current?.setAttribute('transform',tr);
+    const open=since<0?0:Math.min(1,since/.9);const v=Math.round(255*(1-open));
+    hole.current?.setAttribute('fill',`rgb(${v},${v},${v})`);
+    outline.current?.setAttribute('opacity',String(Math.max(0,1-open*1.4)));
+  }});
+  if(stage==='done')return null;
+  const fs=Math.min(size.w*(size.w<760?.21:.19),size.h*.34);
+  const text={x:size.w/2,y:size.h*.5,textAnchor:'middle',dominantBaseline:'central',fontSize:fs,fontWeight:800,letterSpacing:-fs*.03,fontFamily:"'Bricolage Grotesque Variable', sans-serif"} as const;
+  return <div ref={overlayRef} className="intro intro-1" data-lenis-prevent onClick={()=>play()}>
+    <svg className="intro1-svg" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="none" aria-hidden="true">
+      <defs><mask id="intro1-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={size.w} height={size.h}>
+        <rect width={size.w} height={size.h} fill="#fff"/>
+        <g ref={zoom}><text ref={hole} {...text} fill="#fff">RAYGAN</text></g>
+      </mask></defs>
+      <rect width={size.w} height={size.h} fill="#000047" mask="url(#intro1-mask)"/>
+      <g ref={outlineZoom}><text ref={outline} {...text} fill="none" stroke="#fff" strokeWidth={1.2} strokeDasharray={`${pct*16} 2400`} vectorEffect="non-scaling-stroke">RAYGAN</text></g>
+    </svg>
+    <p className="intro1-hand" style={{top:`calc(50% + ${fs*.5}px)`}}>Created to Create.</p>
+    <Hud stage={stage} pct={pct} play={play} hint="SCROLL" tone="dark"/>
+  </div>;
+}
 
-// 2 · An ON AIR sign over a waveform that fills as it loads; at 100% the sign lights up.
-function OnAir(){const s=useIntro();if(s.stage==='done')return null;const bars=48;return <Shell id={2} {...s}>
-  <div className="intro2-sign"><span>ON AIR</span></div>
-  <div className="intro2-wave" aria-hidden="true">{Array.from({length:bars},(_,i)=><i key={i} className={i/bars<s.pct/100?'on':''} style={{['--h' as string]:`${20+Math.round(Math.abs(Math.sin(i*1.7)*Math.cos(i*.45))*80)}%`,['--d' as string]:`${(i%7)*-.15}s`}}/>)}</div>
-  <p className="intro2-show">UNSCRIPTED WITH RAYGAN</p>
-</Shell>}
-
-// 3 · The support page's street, full screen: Reagan walks while the neighbourhood passes and the
-// day's distance fills in; entering pushes the camera in on him and into the homepage.
-function WalkIn(){const s=useIntro();if(s.stage==='done')return null;return <Shell id={3} {...s} hint="SCROLL TO WALK IN">
-  <div className="intro3-head"><p className="eyebrow">REAGAN MARFO</p><p className="handwritten">Still moving. Still creating.</p></div>
-  <div className="intro3-stage"><div className="moving-scene intro3-scene" aria-hidden="true"><MovingStreet/></div></div>
-  <div className="intro3-progress" aria-hidden="true"><i/></div>
-</Shell>}
+// 2 and 3 · Three.js scenes, loaded only when they are shown.
+type Loader=()=>Promise<(c:HTMLCanvasElement)=>Promise<IntroScene>>;
+function ThreeIntro({id,load,hint,tone}:{id:number;load:Loader;hint:string;tone:'dark'|'light'}){
+  const canvas=useRef<HTMLCanvasElement>(null);const scene=useRef<IntroScene|null>(null);const [ready,setReady]=useState(false);
+  useEffect(()=>{let live=true;let made:IntroScene|null=null;
+    load().then(create=>create(canvas.current!)).then(s=>{made=s;if(!live){s.dispose();return}scene.current=s;setReady(true)});
+    const fit=()=>scene.current?.resize();addEventListener('resize',fit);
+    return ()=>{live=false;removeEventListener('resize',fit);made?.dispose();scene.current=null};
+  },[load]);
+  const {stage,pct,overlayRef,play}=useScrollIntro({sceneReady:ready,onFrame:(p,t,since)=>scene.current?.render(p,t,since)});
+  if(stage==='done')return null;
+  return <div ref={overlayRef} className={`intro intro-${id} intro-3d`} data-lenis-prevent onClick={()=>play()}>
+    <canvas ref={canvas} className="intro-canvas"/>
+    <Hud stage={stage} pct={pct} play={play} hint={hint} tone={tone}/>
+  </div>;
+}
+const loadStudio:Loader=()=>import('@/components/intro/studio-scene').then(m=>m.createStudio);
+const loadStreet:Loader=()=>import('@/components/intro/street-scene').then(m=>m.createStreet);
 
 export function IntroPreview({variant:v}:{variant?:string}){
-  if(v==='1')return <Written/>;if(v==='2')return <OnAir/>;if(v==='3')return <WalkIn/>;return null;
+  if(v==='1')return <Letters/>;
+  if(v==='2')return <ThreeIntro id={2} load={loadStudio} hint="SCROLL TO GO ON AIR" tone="dark"/>;
+  if(v==='3')return <ThreeIntro id={3} load={loadStreet} hint="SCROLL TO WALK" tone="light"/>;
+  return null;
 }
