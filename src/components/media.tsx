@@ -38,7 +38,7 @@ export function EventAlbums({albums}:{albums:EventAlbum[]}){
   return <div className="event-albums">
     <div className="section-heading"><h2>From stages and conversations</h2><span className="gallery-instruction">Choose an event to view the album</span></div>
     <div className="event-album-grid">{albums.map((item,index)=><button type="button" className="event-album-card" key={item.name} onClick={()=>open(index)} aria-label={`Open ${item.name} photo album, ${item.images.length} photos`}>
-      <span className="event-album-cover"><Image src={item.images[0]} alt="" fill sizes="(max-width:700px) 92vw, 31vw"/></span>
+      <span className="event-album-cover"><Image src={item.images[0]} alt={`Reagan Marfo at ${item.name}`} fill sizes="(max-width:700px) 92vw, 31vw"/></span>
       <span className="event-album-meta"><strong>{item.name}</strong><span className="event-album-open">VIEW ALBUM <Arrow/></span></span>
     </button>)}</div>
     <dialog ref={dialog} className="event-album-dialog" aria-labelledby="event-album-title" onClose={()=>setSelected(null)} onClick={event=>{if(event.target===event.currentTarget)close()}}>

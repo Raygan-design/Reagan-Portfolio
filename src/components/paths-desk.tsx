@@ -12,9 +12,9 @@ import {testimonials,type Testimonial} from '@/lib/testimonials';
 // The tilt lives on .pc8-polaroid and the page's scroll-in rise on its .pc8-slot wrapper, so
 // the two transforms never fight.
 const paths=[
-  {key:'speaking',num:'01',label:'SPEAKING & HOSTING',title:'Speaking & Event hosting',short:'Speaking & Event hosting',flip:'see photos',text:'Book me for your next conference, summit or company event. I speak on creativity, design, technology, entrepreneurship and purpose.',topics:['Creativity','Design','Technology','Entrepreneurship','Purpose'],cta:'EXPLORE SPEAKING',href:'/speaking',
+  {key:'speaking',num:'01',label:'SPEAKING & HOSTING',title:'Speaking & Event hosting',short:'Speaking & Event hosting',photoAlt:'Reagan Marfo speaking and hosting at events',flip:'see photos',text:'Book me for your next conference, summit or company event. I speak on creativity, design, technology, entrepreneurship and purpose.',topics:['Creativity','Design','Technology','Entrepreneurship','Purpose'],cta:'EXPLORE SPEAKING',href:'/speaking',
     images:['/images/01M1Y7NVNZ8PHDQ6NM6MRMCTEC.webp','/images/01M1Y7JMRDYV5AQF8GS2H73PT7.webp','/images/01M1Y7P55KEFSDB8SQQGJ1Q2EG.webp','/images/01M1Y7JMRC2XWKYBD3QV25TCMM.webp','/images/01M1Y7R9BWCZPE29S3DAZ0TNSH.webp']},
-  {key:'consulting',num:'02',label:'ONE-TO-ONE',title:'Creative consulting',short:'Consulting',flip:'see photos',text:'Get practical guidance on product and design, podcast development, personal branding, content strategy or turning a creative idea into a clear plan.',topics:services.map(s=>s.title),cta:'BOOK A SESSION',href:'/consulting',
+  {key:'consulting',num:'02',label:'ONE-TO-ONE',title:'Creative consulting',short:'Consulting',photoAlt:'Reagan Marfo at creative sessions and events',flip:'see photos',text:'Get practical guidance on product and design, podcast development, personal branding, content strategy or turning a creative idea into a clear plan.',topics:services.map(s=>s.title),cta:'BOOK A SESSION',href:'/consulting',
     images:['/images/01M1Y233ZF9XV5D7QME1AAYJA9.webp','/images/01M1Y7R9BW6447CG4VFFD712EG.webp','/images/08E5H8PD7X3R3R12CTMEP7ANHZ.webp','/images/01M1Y7R9BW40JX6DHDF6ZS9M5S.webp'],
     // With testimonials in the list, the card turns over to them instead of the photos.
     quotes:testimonials},
@@ -29,9 +29,9 @@ function useSlide(count:number,playing:boolean,ms:number){
   return [n,go] as const;
 }
 const Dots=({count,n}:{count:number;n:number})=><div className="pc8-dots" aria-hidden="true">{Array.from({length:count},(_,i)=><i key={i} className={i===n?'on':''}/>)}</div>;
-function Slides({images,playing}:{images:string[];playing:boolean}){
+function Slides({images,playing,alt}:{images:string[];playing:boolean;alt:string}){
   const [n]=useSlide(images.length,playing,2600);
-  return <><div className="pc8-photo">{images.map((src,i)=><Image key={src} src={src} alt="" fill sizes="(max-width:760px) 90vw, 340px" className={i===n?'on':''}/>)}</div><Dots count={images.length} n={n}/></>;
+  return <><div className="pc8-photo">{images.map((src,i)=><Image key={src} src={src} alt={`${alt}, photo ${i+1} of ${images.length}`} fill sizes="(max-width:760px) 90vw, 340px" className={i===n?'on':''}/>)}</div><Dots count={images.length} n={n}/></>;
 }
 function Quotes({quotes,playing}:{quotes:Testimonial[];playing:boolean}){
   const [n,go]=useSlide(quotes.length,playing,5200);
@@ -58,7 +58,7 @@ export function PathsDesk(){const [turned,setTurned]=useState<number[]>([]);cons
     {paths.map((p,i)=>{const on=turned.includes(i),back=p.quotes?.length?'testimonials':p.flip;return <div key={p.key} className="pc8-slot"><div className={`pc8-polaroid p${i}${on?' turned':''}`} onClick={e=>{if((e.target as HTMLElement).closest('a,button'))return;turn(i)}}>
       <div className="pc8-inner">
         <div className="pc8-info" inert={on}><span className="pc8-tape" aria-hidden="true"/><div className="pc8-info-top"><span className="eyebrow">{p.num} / {p.label}</span><button type="button" className="pc8-flip" onClick={e=>turn(i,e.currentTarget.closest<HTMLElement>('.pc8-polaroid'))} aria-label={`Turn the ${p.title} card over to see ${back}`}>{back} ↻</button></div><h2>{p.title}</h2><p>{p.text}</p><ul>{p.topics.map(t=><li key={t}>{t}</li>)}</ul><Link className="button" href={p.href}>{p.cta} <Arrow/></Link></div>
-        <div className="pc8-pics" inert={!on}><span className="pc8-tape" aria-hidden="true"/><button type="button" className="pc8-turn-back" onClick={e=>turn(i,e.currentTarget.closest<HTMLElement>('.pc8-polaroid'))}>Turn back to {p.title}</button>{p.quotes?.length?<Quotes quotes={p.quotes} playing={on}/>:<Slides images={p.images??[]} playing={on}/>}{!p.quotes?.length&&<span className="handwritten">{p.short}</span>}</div>
+        <div className="pc8-pics" inert={!on}><span className="pc8-tape" aria-hidden="true"/><button type="button" className="pc8-turn-back" onClick={e=>turn(i,e.currentTarget.closest<HTMLElement>('.pc8-polaroid'))}>Turn back to {p.title}</button>{p.quotes?.length?<Quotes quotes={p.quotes} playing={on}/>:<Slides images={p.images??[]} playing={on} alt={p.photoAlt}/>}{!p.quotes?.length&&<span className="handwritten">{p.short}</span>}</div>
       </div>
     </div></div>})}
   </div>

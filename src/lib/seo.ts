@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import {site} from './site';
+import {durations,prices,services} from './catalog';
 
 // Per-page search and link-preview details. Next merges metadata shallowly, so each page sets its
 // whole openGraph and twitter blocks here rather than inheriting part of the layout's.
@@ -26,7 +27,17 @@ export function personJsonLd(){
         description:'Ghanaian creative entrepreneur, product designer, podcast host and speaker telling stories, building communities and designing products.',email:`mailto:${site.email}`,
         knowsAbout:['Product design','UI/UX design','Podcasting','Entrepreneurship','Public speaking','Event hosting','Creative strategy'],
         worksFor:site.ventures.map(v=>({'@type':'Organization',name:v.name,url:v.href})),sameAs:[...new Set(sameAs)]},
-      {'@type':'WebSite','@id':`${site.url}/#website`,url:site.url,name:SITE_NAME,publisher:{'@id':`${site.url}/#person`},inLanguage:'en'},
+      {'@type':'WebSite','@id':`${site.url}/#website`,url:site.url,name:SITE_NAME,publisher:{'@id':`${site.url}/#person`},inLanguage:'en-GB'},
     ],
   };
 }
+
+// The About page as Reagan's profile page.
+export function profileJsonLd(){return {'@context':'https://schema.org','@type':'ProfilePage',url:`${site.url}/about`,name:'About — Becoming Reagan Marfo',mainEntity:{'@id':`${site.url}/#person`}}}
+
+// Consulting sessions with their prices, so search engines can show what is offered.
+export function consultingJsonLd(){return {'@context':'https://schema.org','@type':'Service',name:'Creative Consulting with Reagan Marfo',serviceType:'Creative and product design consulting',url:`${site.url}/consulting`,provider:{'@id':`${site.url}/#person`},areaServed:'Worldwide',
+  hasOfferCatalog:{'@type':'OfferCatalog',name:'Strategy calls',itemListElement:services.flatMap(s=>durations.map(d=>({'@type':'Offer',name:`${s.title} — ${d}-minute strategy call`,description:s.description,price:prices[d],priceCurrency:'GHS',url:`${site.url}/consulting/book?service=${s.id}`})))}}}
+
+// Renders structured data safely inside a script tag.
+export const jsonLdScript=(data:object)=>({__html:JSON.stringify(data).replace(/</g,'\\u003c')});
