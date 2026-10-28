@@ -312,3 +312,7 @@
 .home-intro .hero-headline .hl{display:block}
 @media(min-width:761px){.home-intro .hero-headline{font-size:min(4.85vw,76px);line-height:1.08}}
 @media(max-width:760px){.home-intro .hero-headline{font-size:min(calc((100vw - 40px) / 10.9),44px);line-height:1.1}.home-intro .hero-headline .hl>span{display:block}}
+/* Less space around the smaller hero headline */
+.home-hero{min-height:622px}
+@media(max-width:1100px){.home-hero{min-height:570px}}
+@media(max-width:760px){.home-hero{min-height:0;padding-top:24px;padding-bottom:28px;gap:24px}.home-intro .handwritten{margin-top:14px}}
