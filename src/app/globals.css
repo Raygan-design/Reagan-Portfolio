@@ -230,7 +230,7 @@
 /* Paths: no heading; the section flows straight into the Speaking and Consulting rows. */
 .paths-section{padding-top:24px;padding-bottom:24px}
 @media(min-width:1101px){.path-row{grid-template-columns:minmax(0,1fr) minmax(0,2fr) 230px}.path-row>.button,.path-row>.text-button{justify-self:end}}
-/* PREVIEW-PATHS (polaroid desk) */
+/* Speaking / Consulting polaroid desk */
 .pc-8{background:#fafaf7;padding-block:clamp(48px,6vw,90px);overflow:hidden}
 .pc-8 h2{letter-spacing:-.04em}.pc-8 .eyebrow,.pc-8 .handwritten{margin:0}
 .pc8-desk{position:relative;display:flex;justify-content:center;gap:clamp(16px,3vw,56px);padding:60px 0 20px;perspective:1400px}
@@ -262,4 +262,3 @@
 .pc8-back p{font-size:15px;line-height:22px}.pc8-front .handwritten{font-size:26px}
 }
 @media(prefers-reduced-motion:reduce){.pc-8 *{transition:none!important}}
-/* END PREVIEW-PATHS */
