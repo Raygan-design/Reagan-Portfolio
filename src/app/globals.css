@@ -316,3 +316,11 @@
 .home-hero{min-height:622px}
 @media(max-width:1100px){.home-hero{min-height:570px}}
 @media(max-width:760px){.home-hero{min-height:0;padding-top:24px;padding-bottom:28px;gap:24px}.home-intro .handwritten{margin-top:14px}}
+
+
+/* About: short bio beside the portrait, with the roles set large */
+.about-bio{display:flex;flex-direction:column;justify-content:flex-end;gap:28px;padding:8px 8px 8px 32px}
+.about-roles{margin:0;font-size:clamp(48px,6vw,92px);font-weight:800;line-height:.92;letter-spacing:-.05em;color:var(--night);text-transform:uppercase}
+.about-roles span{display:block}.about-roles span:nth-child(2){color:var(--indigo)}
+.about-bio>p:last-child{margin:0;font-size:clamp(18px,1.5vw,22px);line-height:1.5;color:#2c2c3a;max-width:34ch}
+@media(max-width:760px){.about-bio{padding:8px 0 0;gap:20px}.about-roles{font-size:52px}.about-bio>p:last-child{font-size:18px}}
