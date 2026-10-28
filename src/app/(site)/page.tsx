@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { ExternalLink } from '@/components/chrome';
 import { Film } from '@/components/media';
 import { PathsDesk } from '@/components/paths-desk';
-import { IntroPreview } from '@/components/intro-preview';
 import { site } from '@/lib/site';
 import paper from '@/content/paper.json';
 
@@ -18,8 +17,7 @@ const brands:{name:string;file:string;width:number;height:number;video?:string}[
   {name:"Zoe Health’Care",file:'zoe-healthcare',width:2673,height:972,video:'https://www.instagram.com/reel/DbNmuDXANcY/'},
   {name:'Choppity',file:'choppity',width:4794,height:714,video:'https://www.instagram.com/reel/DWoLjkEDC8N/'},
 ];
-export default async function Home({searchParams}:{searchParams:Promise<{intro?:string}>}){const {intro}=await searchParams;return <>
-  <IntroPreview variant={intro}/>
+export default function Home(){return <>
   <div className="home-entrance">
   <section className="home-hero section"><div className="hero-kickers eyebrow"><span>I DO ALOT OF THINGS</span><span>I AM A BORING PERSON</span></div><div className="home-intro"><HeroHeadline/><p className="handwritten">Created to Create.</p></div><div className="hero-bottom"><p>My mission is to change narratives, challenge limiting beliefs, and inspire people to recognise that they can do more and achieve greatness.</p><div className="hero-actions"><ExternalLink className="button" href={site.podcastYoutube}>WATCH PODCAST <Arrow/></ExternalLink></div></div></section>
   <div className="home-film"><Film poster={paper['OR-0'].images[0]} youtube="P7m_gCL0djs" heading="Born into Hardship, Built to Execute"/></div>
