@@ -8,7 +8,7 @@ import {SupportFab} from '@/components/support-fab';
 import { site } from '@/lib/site';
 import { pageMetadata, personJsonLd, SITE_NAME } from '@/lib/seo';
 
-const {alternates:_canonical,...defaults}=pageMetadata({title:'Reagan Marfo — Creative Entrepreneur',absoluteTitle:true,path:'/',description:'I’m Reagan Marfo, a Ghanaian creative entrepreneur building products, media, stories and communities. Product designer, podcast host and speaker.'});
+const {alternates:_canonical,...defaults}=pageMetadata({title:'Reagan Marfo — Creative Entrepreneur',absoluteTitle:true,path:'/',description:'I’m Reagan Marfo, a Ghanaian creative entrepreneur telling stories, building communities and designing products. Podcast host, speaker and product designer.'});
 export const metadata: Metadata = {
   // Defaults for any page without its own; each page sets its own canonical link.
   ...defaults,
