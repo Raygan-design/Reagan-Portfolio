@@ -20,4 +20,3 @@ export function LostPage({code,title,children,actions}:{code:string;title:React.
 }
 
 export function RefreshButton({primary=true}:{primary?:boolean}){return <button type="button" className={`button${primary?' primary':''}`} onClick={()=>window.location.reload()}>REFRESH THE PAGE</button>}
-export function BackButton(){return <button type="button" className="button" onClick={()=>history.length>1?history.back():window.location.assign('/')}>GO BACK</button>}
