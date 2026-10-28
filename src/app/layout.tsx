@@ -16,5 +16,5 @@ export const metadata: Metadata = {
   applicationName:SITE_NAME,authors:[{name:'Reagan Marfo',url:site.url}],creator:'Reagan Marfo',
 };
 export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en-GB"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(personJsonLd()).replace(/</g,'\\u003c')}}/><a className="skip-link" href="#main">Skip to content</a>{children}<SmoothScroll/><SupportFab/></body></html>;
+  return <html lang="en-GB"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(personJsonLd()).replace(/</g,'\\u003c')}}/>{children}<SmoothScroll/><SupportFab/></body></html>;
 }
