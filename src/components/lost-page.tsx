@@ -1,9 +1,11 @@
 'use client';
 import Link from 'next/link';
+import {preload} from 'react-dom';
 
 // The one page shown when something goes missing or breaks: the Moving Man has walked off past the
 // signpost home. Used by the 404, error and global error pages.
 export function LostPage(){
+  preload('/images/moving-man/walking-sprite.webp',{as:'image'});
   return <main id="main" className="lost-page">
     <Link href="/" className="wordmark lost-wordmark">REAGAN.</Link>
     <div className="lost-copy">
