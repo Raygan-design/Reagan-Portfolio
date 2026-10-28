@@ -17,10 +17,12 @@ const paths=[
     images:['/images/01M1Y233ZF9XV5D7QME1AAYJA9.webp','/images/01M1Y7R9BW6447CG4VFFD712EG.webp','/images/08E5H8PD7X3R3R12CTMEP7ANHZ.webp','/images/01M1Y7R9BW40JX6DHDF6ZS9M5S.webp'],
     // Client testimonials: add {quote,name,role} entries and the card turns over to them
     // instead of the photos.
-    quotes:[] as Quote[]},
+    quotes:[
+      {quote:'Reagan made design feel practical and attainable. Watching him design live opened my mind to how far I could take it, and gave me the confidence to pursue this path.',name:'Emmanuel Peter Amexo',role:'Product Designer, MTN Ghana',photo:'/images/testimonials/emmanuel-amexo.webp',href:'https://www.linkedin.com/in/emmanuel-peter-amexo-09a0b11b8/'},
+    ] as Quote[]},
 ];
 
-type Quote={quote:string;name:string;role:string};
+type Quote={quote:string;name:string;role:string;photo?:string;href?:string};
 // Steps through a card's slides (photos or testimonials) while it is turned over.
 function useSlide(count:number,playing:boolean,ms:number){
   const [n,setN]=useState(0);
@@ -36,8 +38,8 @@ function Quotes({quotes,playing}:{quotes:Quote[];playing:boolean}){
   const n=useSlide(quotes.length,playing,5200);
   return <><div className="pc8-photo pc8-quotes">{quotes.map((q,i)=><figure key={i} className={i===n?'on':''} aria-hidden={i!==n}>
     <span className="pc8-mark" aria-hidden="true">“</span><blockquote>{q.quote}</blockquote>
-    <figcaption><span className="pc8-avatar" aria-hidden="true">{q.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</span><span><b>{q.name}</b>{q.role}</span></figcaption>
-  </figure>)}</div><Dots count={quotes.length} n={n}/></>;
+    <figcaption>{q.photo?<Image className="pc8-avatar" src={q.photo} alt="" width={44} height={44}/>:<span className="pc8-avatar" aria-hidden="true">{q.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</span>}<span>{q.href?<a href={q.href} target="_blank" rel="noopener noreferrer"><b>{q.name}</b></a>:<b>{q.name}</b>}{q.role}</span></figcaption>
+  </figure>)}</div>{quotes.length>1&&<Dots count={quotes.length} n={n}/>}</>;
 }
 
 export function PathsDesk(){const [turned,setTurned]=useState<number[]>([]);const turn=(i:number)=>setTurned(t=>t.includes(i)?t.filter(x=>x!==i):[...t,i]);return <section className="section pc pc-8">
