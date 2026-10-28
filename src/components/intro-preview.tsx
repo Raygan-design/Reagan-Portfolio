@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
+import {MovingStreet} from '@/components/moving-man';
 
 // Preview only (?intro=1…3): three loading intros that sit over the homepage while it loads,
 // count to 100, then wait for a scroll, swipe, tap or key before moving the visitor in.
@@ -54,14 +55,12 @@ function OnAir(){const s=useIntro();if(s.stage==='done')return null;const bars=4
   <p className="intro2-show">UNSCRIPTED WITH RAYGAN</p>
 </Shell>}
 
-// 3 · The walking man from the support page crosses a line (the loading bar) to a doorway.
-function WalkIn(){const s=useIntro();if(s.stage==='done')return null;return <Shell id={3} {...s}>
-  <div className="intro3-scene">
-    <div className="intro3-door" aria-hidden="true"><span/></div>
-    <div className="intro3-track"><i/></div>
-    <div className="intro3-man" aria-hidden="true"/>
-  </div>
-  <p className="intro3-name">REAGAN MARFO</p>
+// 3 · The support page's street, full screen: Reagan walks while the neighbourhood passes and the
+// day's distance fills in; entering pushes the camera in on him and into the homepage.
+function WalkIn(){const s=useIntro();if(s.stage==='done')return null;return <Shell id={3} {...s} hint="SCROLL TO WALK IN">
+  <div className="intro3-head"><p className="eyebrow">REAGAN MARFO</p><p className="handwritten">Still moving. Still creating.</p></div>
+  <div className="intro3-stage"><div className="moving-scene intro3-scene" aria-hidden="true"><MovingStreet/></div></div>
+  <div className="intro3-progress" aria-hidden="true"><i/></div>
 </Shell>}
 
 export function IntroPreview({variant:v}:{variant?:string}){

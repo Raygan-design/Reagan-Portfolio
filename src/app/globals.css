@@ -301,22 +301,18 @@
 .intro-2.is-leaving .intro2-sign span{opacity:0;transition:opacity .2s}
 .intro-2.is-leaving .intro2-wave,.intro-2.is-leaving .intro2-show,.intro-2.is-leaving .intro-foot,.intro-2.is-leaving .intro-skip{opacity:0;transition:opacity .3s}
 /* 3 · walk in */
-.intro-3{background:#fafaf7;color:var(--night)}
-.intro3-scene{position:relative;width:min(760px,86vw);height:300px}
-.intro3-door{position:absolute;right:0;bottom:0;width:120px;height:250px;border:2px solid var(--night);border-bottom:0;transform-origin:50% 60%;transition:transform 1.3s cubic-bezier(.7,0,.3,1)}
-.intro3-door span{position:absolute;inset:0;background:var(--night);opacity:.06;transition:opacity .6s,background .6s}
-.intro-3.is-ready .intro3-door span{background:var(--indigo);opacity:.35}
-.intro3-track{position:absolute;left:0;right:120px;bottom:0;height:2px;background:#00004720}
-.intro3-track i{position:absolute;inset:0;background:var(--night);transform-origin:left;transform:scaleX(var(--pct))}
-.intro3-man{position:absolute;bottom:2px;left:calc((100% - 120px - 96px) * var(--pct));width:96px;height:144px;background:url('/images/moving-man/walking-sprite.svg') 0 0/480px 144px no-repeat;animation:intro-walk .7s steps(5) infinite}
-.intro-3.is-ready .intro3-man{animation:none;background-position:0 0}
-@keyframes intro-walk{to{background-position-x:-480px}}
-.intro3-name{margin:36px 0 0;font-size:12px;letter-spacing:.3em;opacity:.7}
-.intro-3.is-leaving{background:transparent;transition:background .5s .8s}
-.intro-3.is-leaving .intro3-man{left:calc(100% - 108px);opacity:0;animation:intro-walk .7s steps(5) infinite;transition:left .6s linear,opacity .3s .4s}
-.intro-3.is-leaving .intro3-door{transform:scale(18);transition-delay:.45s}
-.intro-3.is-leaving .intro3-door span{background:#fafaf7;opacity:1}
-.intro-3.is-leaving .intro3-track,.intro-3.is-leaving .intro3-name,.intro-3.is-leaving .intro-foot,.intro-3.is-leaving .intro-skip{opacity:0;transition:opacity .3s}
-@media(max-width:760px){.intro1-line{font-size:22vw;line-height:1;white-space:normal}.intro1-line span{display:block}.intro1-corners{flex-direction:column;gap:6px;right:auto}.intro3-scene{height:240px}.intro3-door{width:90px;height:190px}.intro3-track{right:90px}.intro3-man{left:calc((100% - 90px - 72px) * var(--pct));width:72px;height:108px;background-size:360px 108px}@keyframes intro-walk{to{background-position-x:-360px}}.intro-3.is-leaving .intro3-man{left:calc(100% - 80px)}}
+.intro-3{--zoom:1.9;--floor:clamp(70px,12vh,120px);--head:.98;justify-content:flex-end;background:linear-gradient(0deg,#faf9f5 0 var(--floor),#fff var(--floor));color:var(--night)}
+.intro3-head{display:flex;flex-direction:column;align-items:center;position:absolute;bottom:calc(var(--floor) + 310px * var(--zoom) * var(--head));left:0;right:0;text-align:center;z-index:2;transition:opacity .4s}
+.intro3-head .eyebrow{display:block;width:auto;margin:0;text-align:center;letter-spacing:.3em;opacity:.75}
+.intro3-head .handwritten{margin:8px 0 0;font-size:clamp(40px,5vw,72px);color:var(--night)}
+.intro3-stage{position:absolute;left:0;right:0;bottom:var(--floor);height:calc(310px * var(--zoom));transform-origin:16% 75%;transition:transform 1.3s cubic-bezier(.7,0,.3,1)}
+.intro3-scene{position:absolute;left:0;top:0;width:calc(100vw / var(--zoom));height:310px;border:0;transform:scale(var(--zoom));transform-origin:0 0;background:transparent}
+.intro3-progress{position:absolute;left:var(--gutter);right:var(--gutter);bottom:var(--floor);height:2px;background:#00004714;z-index:2}
+.intro3-progress i{position:absolute;inset:0;background:var(--night);transform-origin:left;transform:scaleX(var(--pct))}
+.intro-3 .intro-foot{bottom:clamp(30px,5vh,56px)}
+.intro-3.is-leaving{background:transparent;transition:background .5s .85s}
+.intro-3.is-leaving .intro3-stage{transform:scale(5);opacity:0;transition:transform 1.3s cubic-bezier(.7,0,.3,1),opacity .45s .85s}
+.intro-3.is-leaving .intro3-head,.intro-3.is-leaving .intro3-progress,.intro-3.is-leaving .intro-foot,.intro-3.is-leaving .intro-skip{opacity:0;transition:opacity .3s}
+@media(max-width:760px){.intro1-line{font-size:22vw;line-height:1;white-space:normal}.intro1-line span{display:block}.intro1-corners{flex-direction:column;gap:6px;right:auto}.intro-3{--zoom:1.3;--floor:110px;--head:.85}}
 @media(prefers-reduced-motion:reduce){.intro *{animation:none!important;transition:none!important}.intro.is-leaving{opacity:0;transition:opacity .4s!important}}
 /* END PREVIEW-INTRO */
