@@ -8,7 +8,11 @@ import { ExternalLink } from '@/components/chrome';
 import { Film } from '@/components/media';
 import { PathsDesk } from '@/components/paths-desk';
 import { site } from '@/lib/site';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import paper from '@/content/paper.json';
+
+export const metadata:Metadata=pageMetadata({title:'Reagan Marfo — Creative Entrepreneur',absoluteTitle:true,path:'/',description:'I’m Reagan Marfo, a Ghanaian creative entrepreneur building products, media, stories and communities. Product designer, podcast host and speaker.'});
 
 // The brand logos link to the video Raygan made for each brand.
 const brands:{name:string;file:string;width:number;height:number;video?:string}[]=[
@@ -19,7 +23,7 @@ const brands:{name:string;file:string;width:number;height:number;video?:string}[
 ];
 export default function Home(){return <>
   <div className="home-entrance">
-  <section className="home-hero section"><div className="hero-kickers eyebrow"><span>I DO ALOT OF THINGS</span><span>I AM A BORING PERSON</span></div><div className="home-intro"><HeroHeadline/><p className="handwritten">Created to Create.</p></div><div className="hero-bottom"><p>My mission is to change narratives, challenge limiting beliefs, and inspire people to recognise that they can do more and achieve greatness.</p><div className="hero-actions"><ExternalLink className="button" href={site.podcastYoutube}>WATCH PODCAST <Arrow/></ExternalLink></div></div></section>
+  <section className="home-hero section"><div className="hero-kickers eyebrow"><span>I DO A LOT OF THINGS</span><span>I AM A BORING PERSON</span></div><div className="home-intro"><HeroHeadline/><p className="handwritten">Created to Create.</p></div><div className="hero-bottom"><p>My mission is to change narratives, challenge limiting beliefs, and inspire people to recognise that they can do more and achieve greatness.</p><div className="hero-actions"><ExternalLink className="button" href={site.podcastYoutube}>WATCH PODCAST <Arrow/></ExternalLink></div></div></section>
   <div className="home-film"><Film poster={paper['OR-0'].images[0]} youtube="P7m_gCL0djs" heading="Born into Hardship, Built to Execute"/></div>
   </div>
   <section id="ventures" className="section venture-section"><div className="section-heading"><div><p className="eyebrow">01 / VENTURES</p><h2 className="display-heading">What I’m building.</h2></div></div><div className="venture-list">{site.ventures.map((v,i)=><ExternalLink className="venture-row" key={v.name} href={v.href}><span className="eyebrow venture-number">0{i+1}</span><h3>{v.name}</h3><p>{v.description}</p><span className="venture-arrow" aria-hidden="true"><Arrow/></span></ExternalLink>)}</div></section>

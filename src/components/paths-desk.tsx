@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {Arrow} from '@/components/arrow';
 import {services} from '@/lib/catalog';
 import {testimonials,type Testimonial} from '@/lib/testimonials';
@@ -46,13 +46,20 @@ function Quotes({quotes,playing}:{quotes:Testimonial[];playing:boolean}){
     </div></>;
 }
 
-export function PathsDesk(){const [turned,setTurned]=useState<number[]>([]);const turn=(i:number)=>setTurned(t=>t.includes(i)?t.filter(x=>x!==i):[...t,i]);return <section className="section pc pc-8">
+// Clicking anywhere on a card turns it; keyboard and screen-reader users get a real button on each
+// side, focus follows the turn, and the hidden side is inert so only the visible one is read out.
+export function PathsDesk(){const [turned,setTurned]=useState<number[]>([]);const focusNext=useRef<HTMLElement|null>(null);
+  const turn=(i:number,card?:HTMLElement|null)=>{const now=!turned.includes(i);setTurned(t=>now?[...t,i]:t.filter(x=>x!==i));
+    focusNext.current=card?.querySelector<HTMLElement>(now?'.pc8-turn-back':'.pc8-flip')??null};
+  // Runs once the turned side is no longer inert, so it can take focus.
+  useEffect(()=>{focusNext.current?.focus({preventScroll:true});focusNext.current=null},[turned]);
+  return <section className="section pc pc-8" aria-label="Speaking and consulting">
   <div className="pc8-desk">
-    {paths.map((p,i)=><div key={p.key} className="pc8-slot"><div className={`pc8-polaroid p${i}${turned.includes(i)?' turned':''}`} onClick={e=>{if((e.target as HTMLElement).closest('a,button'))return;turn(i)}}>
+    {paths.map((p,i)=>{const on=turned.includes(i),back=p.quotes?.length?'testimonials':p.flip;return <div key={p.key} className="pc8-slot"><div className={`pc8-polaroid p${i}${on?' turned':''}`} onClick={e=>{if((e.target as HTMLElement).closest('a,button'))return;turn(i)}}>
       <div className="pc8-inner">
-        <div className="pc8-info"><span className="pc8-tape" aria-hidden="true"/><div className="pc8-info-top"><span className="eyebrow">{p.num} / {p.label}</span><span className="pc8-flip">{p.quotes?.length?'testimonials':p.flip} ↻</span></div><h2>{p.title}</h2><p>{p.text}</p><ul>{p.topics.map(t=><li key={t}>{t}</li>)}</ul><Link className="button" href={p.href}>{p.cta} <Arrow/></Link></div>
-        <div className="pc8-pics"><span className="pc8-tape" aria-hidden="true"/>{p.quotes?.length?<Quotes quotes={p.quotes} playing={turned.includes(i)}/>:<Slides images={p.images??[]} playing={turned.includes(i)}/>}{!p.quotes?.length&&<span className="handwritten">{p.short}</span>}</div>
+        <div className="pc8-info" inert={on}><span className="pc8-tape" aria-hidden="true"/><div className="pc8-info-top"><span className="eyebrow">{p.num} / {p.label}</span><button type="button" className="pc8-flip" onClick={e=>turn(i,e.currentTarget.closest<HTMLElement>('.pc8-polaroid'))} aria-label={`Turn the ${p.title} card over to see ${back}`}>{back} ↻</button></div><h2>{p.title}</h2><p>{p.text}</p><ul>{p.topics.map(t=><li key={t}>{t}</li>)}</ul><Link className="button" href={p.href}>{p.cta} <Arrow/></Link></div>
+        <div className="pc8-pics" inert={!on}><span className="pc8-tape" aria-hidden="true"/><button type="button" className="pc8-turn-back" onClick={e=>turn(i,e.currentTarget.closest<HTMLElement>('.pc8-polaroid'))}>Turn back to {p.title}</button>{p.quotes?.length?<Quotes quotes={p.quotes} playing={on}/>:<Slides images={p.images??[]} playing={on}/>}{!p.quotes?.length&&<span className="handwritten">{p.short}</span>}</div>
       </div>
-    </div></div>)}
+    </div></div>})}
   </div>
 </section>}
