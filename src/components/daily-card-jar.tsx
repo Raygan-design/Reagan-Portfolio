@@ -171,7 +171,7 @@ async function renderCard({message, by, label, tone}: Today) {
     try { await img.decode(); ctx.drawImage(img, jarX, jarBottom - jarH, jarW, jarH); } catch {}
   }
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#000047';
-  ctx.font = `700 ${34}px 'Bricolage Grotesque Variable'`; ctx.letterSpacing = '0px'; ctx.fillText('RAYGAN.', jarX + jarW + 40, jarBottom - jarH / 2 + 4);
+  ctx.font = `700 ${34}px 'Bricolage Grotesque Variable'`; ctx.letterSpacing = '0px'; ctx.fillText('REAGAN.', jarX + jarW + 40, jarBottom - jarH / 2 + 4);
   ctx.font = `400 ${26}px 'Bricolage Grotesque Variable'`; ctx.fillStyle = '#756a84'; ctx.fillText('A new card every day', jarX + jarW + 40, jarBottom - jarH / 2 + 44);
   return new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Could not create image')), 'image/png'));
 }
