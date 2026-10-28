@@ -12,7 +12,7 @@ import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/seo';
 import paper from '@/content/paper.json';
 
-export const metadata:Metadata=pageMetadata({title:'Reagan Marfo — Creative Entrepreneur',absoluteTitle:true,path:'/',description:'I’m Reagan Marfo, a Ghanaian creative entrepreneur building products, media, stories and communities. Product designer, podcast host and speaker.'});
+export const metadata:Metadata=pageMetadata({title:'Reagan Marfo — Creative Entrepreneur',absoluteTitle:true,path:'/',description:'I’m Reagan Marfo, a Ghanaian creative entrepreneur telling stories, building communities and designing products. Podcast host, speaker and product designer.'});
 
 // The brand logos link to the video Raygan made for each brand.
 const brands:{name:string;file:string;width:number;height:number;video?:string}[]=[
