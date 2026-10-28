@@ -287,12 +287,20 @@
 @media(prefers-reduced-motion:reduce){.pc-8 *{transition:none!important}}
 
 
-/* About: testimonials in the mentorship note */
-.mentor-quotes{display:grid;gap:22px}
-.mentor-quotes figure{margin:0;padding-top:22px;border-top:1px solid #ffffff26}
+/* About: testimonials in the mentorship note, one at a time */
+.mentor-quotes{padding-top:22px;border-top:1px solid #ffffff26}
+.mentor-quotes-stack{display:grid}
+.mentor-quotes figure{grid-area:1/1;margin:0;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .45s ease,transform .45s ease,visibility 0s .45s}
+.mentor-quotes figure.on{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .45s ease}
 .mentor-quotes blockquote{margin:0 0 16px;font-size:17px!important;line-height:1.5!important;color:#fff}
 .mentor-quotes figcaption{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;color:#fff}
 .mentor-quotes figcaption img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
 .mentor-quotes figcaption a:hover{text-decoration:underline}
 .mentor-quotes small{display:block;font-size:12px;font-weight:400;color:#bbb}
+.mentor-quotes-nav{display:flex;align-items:center;gap:14px;margin-top:22px;font-size:12px;letter-spacing:.12em;color:#bbb;font-variant-numeric:tabular-nums}
+.mentor-quotes-nav button{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ffffff40;border-radius:50%;background:none;color:#fff;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.mentor-quotes-nav button:hover{background:#fff;color:#111;border-color:#fff}
+.mentor-quotes-nav button:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.mentor-quotes-nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:760px){.mentor-quotes blockquote{font-size:16px!important}}
+@media(prefers-reduced-motion:reduce){.mentor-quotes figure{transition:none}}

@@ -50,7 +50,7 @@ function today() {
   const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const label = now.toLocaleDateString('en-GB', {weekday: 'long', day: 'numeric', month: 'long'});
   const entry = (cards as Card[])[shuffled(cards.length, seed)[day % cards.length]];
-  const [message, by] = typeof entry === 'string' ? [entry, 'Raygan'] : [entry.text, entry.by];
+  const [message, by] = typeof entry === 'string' ? [entry, 'Reagan'] : [entry.text, entry.by];
   return {key, label, message, by, tone: tones[(day + seed) % tones.length]};
 }
 type Today = ReturnType<typeof today>;
@@ -171,7 +171,7 @@ async function renderCard({message, by, label, tone}: Today) {
     try { await img.decode(); ctx.drawImage(img, jarX, jarBottom - jarH, jarW, jarH); } catch {}
   }
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#000047';
-  ctx.font = `700 ${34}px 'Bricolage Grotesque Variable'`; ctx.letterSpacing = '0px'; ctx.fillText('RAYGAN.', jarX + jarW + 40, jarBottom - jarH / 2 + 4);
+  ctx.font = `700 ${34}px 'Bricolage Grotesque Variable'`; ctx.letterSpacing = '0px'; ctx.fillText('REAGAN.', jarX + jarW + 40, jarBottom - jarH / 2 + 4);
   ctx.font = `400 ${26}px 'Bricolage Grotesque Variable'`; ctx.fillStyle = '#756a84'; ctx.fillText('A new card every day', jarX + jarW + 40, jarBottom - jarH / 2 + 44);
   return new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Could not create image')), 'image/png'));
 }
@@ -259,10 +259,10 @@ export function DailyCardJar() {
   async function share() {
     if (!card) return; setBusy('share'); setNotice('');
     try {
-      const blob = await cardImage(), file = new File([blob], `raygan-card-${card.key}.png`, {type: 'image/png'});
+      const blob = await cardImage(), file = new File([blob], `reagan-card-${card.key}.png`, {type: 'image/png'});
       const text = `${card.message} — ${card.by}`;
-      if (navigator.canShare?.({files: [file]})) await navigator.share({files: [file], title: 'My card from Raygan', text});
-      else if (navigator.share) await navigator.share({title: 'My card from Raygan', text, url: location.origin});
+      if (navigator.canShare?.({files: [file]})) await navigator.share({files: [file], title: 'My card from Reagan', text});
+      else if (navigator.share) await navigator.share({title: 'My card from Reagan', text, url: location.origin});
       else { download(blob, file.name); setNotice('Saved the image so you can share it.'); }
     } catch (e) { if ((e as Error).name !== 'AbortError') setNotice('Couldn’t share. Try downloading instead.'); }
     setBusy(null);
@@ -273,7 +273,7 @@ export function DailyCardJar() {
   async function save() {
     if (!card) return; setBusy('download'); setNotice('');
     try {
-      const blob = await cardImage(), file = new File([blob], `raygan-card-${card.key}.png`, {type: 'image/png'});
+      const blob = await cardImage(), file = new File([blob], `reagan-card-${card.key}.png`, {type: 'image/png'});
       if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({files: [file]})) {
         await navigator.share({files: [file]});
       } else { download(blob, file.name); setNotice('Saved to your downloads.'); }
