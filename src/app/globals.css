@@ -270,6 +270,12 @@
 .pc8-quotes img.pc8-avatar{opacity:1;transform:none;transition:none}
 .pc8-quotes~.pc8-dots i{background:#fff5}.pc8-quotes~.pc8-dots i.on{background:var(--indigo)}
 .pc8-quotes blockquote{flex-shrink:0}
+.pc8-qnav{display:flex;align-items:center;justify-content:space-between;gap:8px;height:58px;padding:0 2px}
+.pc8-qnav .handwritten{flex:1;text-align:center;font-size:28px;line-height:58px;color:var(--night)}
+.pc8-qnav button{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--night);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.pc8-qnav button:hover{background:var(--night);border-color:var(--night);color:#fff}
+.pc8-qnav button:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.pc8-qnav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:1000px){.pc8-polaroid{height:480px}.pc8-quotes figure{padding:20px 20px 30px}.pc8-mark{font-size:66px;height:36px}.pc8-quotes blockquote{font-size:16px;line-height:1.42}}
 @media(max-width:1000px){
 .pc8-desk{flex-wrap:wrap;gap:44px 28px;padding-top:24px}
